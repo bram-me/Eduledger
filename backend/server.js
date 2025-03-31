@@ -359,4 +359,37 @@ app.get('/api/verify/:transactionId', (req, res) => {
     });
 });
 
+const { FileContentsQuery } = require("@hashgraph/sdk");
+const path = require("path");
+const fs = require("fs");
+
+// Retrieve File from Hedera HFS
+async function fetchFromHedera(fileId) {
+    try {
+        const fileQuery = new FileContentsQuery().setFileId(fileId);
+        const fileData = await fileQuery.execute(client);
+        
+        // Save it locally as a PDF
+        const filePath = path.join(__dirname, `receipts/receipt_${fileId}.pdf`);
+        fs.writeFileSync(filePath, fileData);
+
+        return filePath;
+    } catch (error) {
+        throw new Error("Failed to fetch file from Hedera: " + error.message);
+    }
+}
+
+// API Endpoint to Download Receipt
+app.get("/download-receipt/:fileId", async (req, res) => {
+    try {
+        const { fileId } = req.params;
+        const filePath = await fetchFromHedera(fileId);
+        
+        res.download(filePath); // Send the file for download
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
 app.listen(PORT, () => console.log(`EduLedger server running on port ${PORT}`));

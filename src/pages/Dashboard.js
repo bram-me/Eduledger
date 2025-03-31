@@ -1,54 +1,61 @@
-import React, { useState } from "react";
-import "./Dashboard.css";
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { FaGraduationCap, FaLock, FaChartBar } from "react-icons/fa";
 
-const Dashboard = () => {
-  const [darkMode, setDarkMode] = useState(false);
-
-  const toggleDarkMode = () => setDarkMode(!darkMode);
-
-  const transactions = [
-    { id: 1, date: "2025-03-30", amount: "500 HBAR", status: "Completed" },
-    { id: 2, date: "2025-03-25", amount: "750 HBAR", status: "Pending" },
-    { id: 3, date: "2025-03-20", amount: "1200 HBAR", status: "Completed" },
-  ];
-
+const WelcomePage = () => {
   return (
-    <div className={`dashboard ${darkMode ? "dark" : ""}`}>
-      <header>
-        <h1>EduLedger Dashboard</h1>
-        <button onClick={toggleDarkMode}>
-          {darkMode ? "☀ Light Mode" : "🌙 Dark Mode"}
-        </button>
-      </header>
+    <div className="min-h-screen bg-gray-100 p-6">
+      {/* Hero Section */}
+      <motion.div
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1 }}
+        className="text-center mb-12"
+      >
+        <h1 className="text-5xl font-bold text-blue-600">Welcome to EduLedger</h1>
+        <p className="text-gray-600 text-lg mt-4">
+          A next-generation blockchain-powered school management system.
+        </p>
+        <Button className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 text-lg">
+          Get Started
+        </Button>
+      </motion.div>
 
-      <section className="balance">
-        <h2>Wallet Balance</h2>
-        <p>3,450 HBAR</p>
-      </section>
-
-      <section className="transactions">
-        <h2>Recent Transactions</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Amount</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map((tx) => (
-              <tr key={tx.id}>
-                <td>{tx.date}</td>
-                <td>{tx.amount}</td>
-                <td className={tx.status.toLowerCase()}>{tx.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
+      {/* Features Section */}
+      <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <FeatureCard
+          icon={<FaGraduationCap size={40} className="text-blue-500" />}
+          title="Decentralized Records"
+          description="Secure and transparent academic records stored on Hedera."
+        />
+        <FeatureCard
+          icon={<FaLock size={40} className="text-green-500" />}
+          title="Secure Fee Payments"
+          description="Instant, low-cost payments using Hedera Token Service (HTS)."
+        />
+        <FeatureCard
+          icon={<FaChartBar size={40} className="text-purple-500" />}
+          title="Advanced Analytics"
+          description="Track school performance and student progress effortlessly."
+        />
+      </div>
     </div>
   );
 };
 
-export default Dashboard;
+const FeatureCard = ({ icon, title, description }) => {
+  return (
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      className="bg-white shadow-lg rounded-2xl p-6 text-center"
+    >
+      <div className="mb-4">{icon}</div>
+      <h2 className="text-xl font-semibold">{title}</h2>
+      <p className="text-gray-500 mt-2">{description}</p>
+    </motion.div>
+  );
+};
+
+export default WelcomePage;
