@@ -185,30 +185,30 @@ app.post('/transfer', authenticateToken, async (req, res) => {
 });
 
 
-const { PDFDocument, rgb } = require('pdf-lib');
-const fs = require('fs');
+const QRCode = require('qrcode');
 
 app.get('/download-receipt/:transactionId', async (req, res) => {
     const { transactionId } = req.params;
 
-    // Fetch transaction details
     db.query('SELECT * FROM payments WHERE transaction_id = ?', [transactionId], async (err, results) => {
         if (err || results.length === 0) return res.status(404).json({ error: 'Transaction not found' });
 
         const { student_id, amount, status, timestamp } = results[0];
 
-        // Fetch student details
         db.query('SELECT * FROM students WHERE id = ?', [student_id], async (err, studentResults) => {
             if (err || studentResults.length === 0) return res.status(404).json({ error: 'Student not found' });
 
             const { school } = studentResults[0];
 
-            // Generate PDF
-            const pdfDoc = await PDFDocument.create();
-            const page = pdfDoc.addPage([500, 600]);
+            // Generate a QR code linking to a verification page
+            const qrData = `https://elimuledger.com/verify/${transactionId}`;
+            const qrCode = await QRCode.toDataURL(qrData);
 
+            // Create PDF
+            const pdfDoc = await PDFDocument.create();
+            const page = pdfDoc.addPage([500, 700]);
             const { width, height } = page.getSize();
-            const fontSize = 20;
+            const fontSize = 18;
 
             page.drawText('ElimuLedger Payment Receipt', { x: 50, y: height - 50, size: fontSize, color: rgb(0, 0, 0) });
             page.drawText(`Transaction ID: ${transactionId}`, { x: 50, y: height - 100, size: 14 });
@@ -218,14 +218,21 @@ app.get('/download-receipt/:transactionId', async (req, res) => {
             page.drawText(`Status: ${status}`, { x: 50, y: height - 220, size: 14 });
             page.drawText(`Timestamp: ${timestamp}`, { x: 50, y: height - 250, size: 14 });
 
-            const pdfBytes = await pdfDoc.save();
+            // Embed QR Code Image in PDF
+            const qrImageBytes = Buffer.from(qrCode.split(",")[1], "base64");
+            const qrImage = await pdfDoc.embedPng(qrImageBytes);
+            page.drawImage(qrImage, { x: 50, y: height - 450, width: 150, height: 150 });
 
+            page.drawText('Scan to verify transaction', { x: 50, y: height - 470, size: 12 });
+
+            const pdfBytes = await pdfDoc.save();
             res.setHeader('Content-Type', 'application/pdf');
             res.setHeader('Content-Disposition', `attachment; filename="receipt_${transactionId}.pdf"`);
             res.send(pdfBytes);
         });
     });
 });
+
 
 
 /**
@@ -257,5 +264,15 @@ app.post('/generate-receipt', authenticateToken, (req, res) => {
  * Serve Generated Receipts
  */
 app.use('/receipts', express.static('receipts'));
+
+app.get('/api/verify/:transactionId', (req, res) => {
+    const { transactionId } = req.params;
+
+    db.query('SELECT * FROM payments WHERE transaction_id = ?', [transactionId], (err, results) => {
+        if (err || results.length === 0) return res.status(404).json({ error: 'Transaction not found' });
+        res.json(results[0]);
+    });
+});
+
 
 app.listen(PORT, () => console.log(`EduLedger server running on port ${PORT}`));
