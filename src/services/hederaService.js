@@ -29,4 +29,40 @@ async function transferHbar(amount) {
     }
 }
 
-module.exports = { transferHbar };
+const { AccountBalanceQuery, TransactionRecordQuery } = require("@hashgraph/sdk");
+
+async function getTransactionHistory() {
+    try {
+        const query = new TransactionRecordQuery()
+            .setAccountId(myAccountId)
+            .setMaxQueryPayment(new Hbar(1));
+
+        const records = await query.execute(client);
+        return records.map((record) => ({
+            transactionId: record.transactionId.toString(),
+            amount: record.transfers[0]?.amount.toTinybars() / 100_000_000 || 0,
+            timestamp: record.consensusTimestamp.toDate().toLocaleString(),
+        }));
+    } catch (error) {
+        console.error("Error fetching transaction history:", error);
+        return [];
+    }
+}
+
+async function convertHbarToToken(tokenId, amount) {
+    try {
+        const transaction = new TransferTransaction()
+            .addHbarTransfer(myAccountId, Hbar.fromTinybars(-amount * 100_000_000))
+            .addTokenTransfer(tokenId, myAccountId, -amount)
+            .addTokenTransfer(tokenId, recipientId, amount);
+
+        const txResponse = await transaction.execute(client);
+        const receipt = await txResponse.getReceipt(client);
+        return { status: receipt.status.toString(), transactionId: txResponse.transactionId.toString() };
+    } catch (error) {
+        console.error("Conversion failed:", error);
+        return { error: error.message };
+    }
+}
+
+module.exports = { transferHbar, getBalance, getTransactionHistory, convertHbarToToken };

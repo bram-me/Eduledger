@@ -1,3 +1,111 @@
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  background: #f4f7fc;
+  color: #333;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* Hero Section */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #2196F3, #1E88E5);
+  color: white;
+  padding: 80px 40px;
+  border-radius: 20px;
+  margin: 20px;
+}
+
+.hero-content {
+  flex: 1;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin: 20px 0;
+}
+
+.hero-btn {
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  background: #ffb300;
+  color: black;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.hero-btn:hover {
+  background: #ff9800;
+}
+
+/* Feature Section */
+.features {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 50px 20px;
+}
+
+.feature-box {
+  flex: 1;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.feature-box:hover {
+  transform: translateY(-10px);
+}
+
+.feature-box h3 {
+  margin-top: 10px;
+  font-size: 1.5rem;
+}
+
+.feature-box p {
+  font-size: 1rem;
+  color: #555;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .features {
+    flex-direction: column;
+  }
+}
+
+
+
 .settings-container {
   width: 50%;
   margin: auto;
@@ -76,4 +184,94 @@ button:hover {
 
 .transaction-history .pending {
   color: orange;
+}
+
+/* Wallet Dashboard Styles */
+.wallet-dashboard {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: linear-gradient(145deg, #1a1a2e, #16213e);
+  color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.wallet-dashboard h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.wallet-balance {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #29c7ac;
+  margin-bottom: 1rem;
+}
+
+.transaction-history {
+  margin-top: 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.transaction-history h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #ffcc00;
+}
+
+.transaction-history ul {
+  list-style: none;
+  padding: 0;
+}
+
+.transaction-history li {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.8rem;
+  margin: 0.5rem 0;
+  border-radius: 5px;
+  font-size: 1.1rem;
+}
+
+.qr-payment {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.qr-payment input {
+  width: 80%;
+  padding: 0.8rem;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: none;
+  margin-bottom: 1rem;
+}
+
+.qr-payment button {
+  padding: 0.8rem 1.5rem;
+  background: #ffcc00;
+  color: black;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.qr-payment button:hover {
+  background: #ffaa00;
+}
+
+.qr-payment canvas {
+  margin-top: 1rem;
+  border: 5px solid white;
+  padding: 1rem;
+  background: white;
 }
