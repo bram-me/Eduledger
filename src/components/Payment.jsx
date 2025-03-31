@@ -1,6 +1,6 @@
 import { useState } from "react";
-import QRCodePayment from "./QRCodePayment";
-import QRCodeScanner from "./QRCodeScanner";
+import QRCodePayment from "./QrCodePayment";
+// import QRCodeScanner from "./QRCodeScanner";
 
 const PaymentPage = () => {
     const [studentId, setStudentId] = useState("");
