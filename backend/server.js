@@ -4,6 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const sqlite3 = require('sqlite3').verbose();
 const { 
     Client, PrivateKey, AccountCreateTransaction, 
     AccountBalanceQuery, TransferTransaction, Hbar 
@@ -17,8 +18,40 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(bodyParser.json());
 
-const users = {}; // Temporary user storage (Use DB in production)
 const SECRET_KEY = process.env.JWT_SECRET || 'supersecret';
+
+// Initialize SQLite Database
+const db = new sqlite3.Database('./eduledger.db', (err) => {
+    if (err) console.error('Error connecting to database:', err.message);
+    else console.log('Connected to SQLite database.');
+});
+
+// Create necessary tables if they do not exist
+db.serialize(() => {
+    db.run(`CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS accounts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        account_id TEXT UNIQUE NOT NULL,
+        private_key TEXT NOT NULL,
+        balance INTEGER DEFAULT 1000000,  -- Stored in tinybars
+        FOREIGN KEY(user_id) REFERENCES users(id)
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS transactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        transaction_id TEXT UNIQUE NOT NULL,
+        from_account TEXT NOT NULL,
+        to_account TEXT NOT NULL,
+        amount INTEGER NOT NULL,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+});
 
 // Initialize Hedera Testnet Client
 const client = Client.forTestnet();
@@ -36,11 +69,19 @@ const generateToken = (username) => {
  */
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
-    if (users[username]) return res.status(400).json({ error: 'User already exists' });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    users[username] = { password: hashedPassword };
-    res.json({ message: 'User registered successfully' });
+    db.get("SELECT * FROM users WHERE username = ?", [username], async (err, row) => {
+        if (row) return res.status(400).json({ error: 'User already exists' });
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        db.run("INSERT INTO users (username, password) VALUES (?, ?)", 
+            [username, hashedPassword], 
+            function (err) {
+                if (err) return res.status(500).json({ error: 'Database error' });
+                res.json({ message: 'User registered successfully' });
+            }
+        );
+    });
 });
 
 /**
@@ -48,14 +89,14 @@ app.post('/register', async (req, res) => {
  */
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    const user = users[username];
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    const token = generateToken(username);
-    res.json({ token });
+    db.get("SELECT * FROM users WHERE username = ?", [username], async (err, user) => {
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+        const token = generateToken(username);
+        res.json({ token });
+    });
 });
 
 /**
@@ -88,10 +129,13 @@ app.post('/create-account', authenticateToken, async (req, res) => {
         const receipt = await response.getReceipt(client);
         const newAccountId = receipt.accountId;
 
-        res.json({ 
-            accountId: newAccountId.toString(), 
-            privateKey: newPrivateKey.toStringRaw() 
-        });
+        db.run("INSERT INTO accounts (user_id, account_id, private_key) VALUES ((SELECT id FROM users WHERE username = ?), ?, ?)",
+            [req.user.username, newAccountId.toString(), newPrivateKey.toStringRaw()],
+            (err) => {
+                if (err) return res.status(500).json({ error: 'Database error' });
+                res.json({ accountId: newAccountId.toString(), privateKey: newPrivateKey.toStringRaw() });
+            }
+        );
     } catch (error) {
         res.status(500).json({ error: 'Error creating Hedera account' });
     }
@@ -103,8 +147,10 @@ app.post('/create-account', authenticateToken, async (req, res) => {
 app.get('/balance/:accountId', authenticateToken, async (req, res) => {
     try {
         const { accountId } = req.params;
-        const balance = await new AccountBalanceQuery().setAccountId(accountId).execute(client);
-        res.json({ balance: balance.hbars.toString() });
+        db.get("SELECT balance FROM accounts WHERE account_id = ?", [accountId], (err, row) => {
+            if (!row) return res.status(404).json({ error: 'Account not found' });
+            res.json({ balance: row.balance });
+        });
     } catch (error) {
         res.status(500).json({ error: 'Error fetching balance' });
     }
@@ -126,11 +172,13 @@ app.post('/transfer', authenticateToken, async (req, res) => {
 
         const response = await transaction.execute(client);
         const receipt = await response.getReceipt(client);
+        const transactionId = response.transactionId.toString();
 
-        res.json({ 
-            status: receipt.status.toString(), 
-            transactionId: response.transactionId.toString() 
-        });
+        db.run("INSERT INTO transactions (transaction_id, from_account, to_account, amount) VALUES (?, ?, ?, ?)", 
+            [transactionId, fromAccountId, toAccountId, amount]
+        );
+
+        res.json({ status: receipt.status.toString(), transactionId });
     } catch (error) {
         res.status(500).json({ error: 'Transaction failed' });
     }
@@ -148,7 +196,6 @@ app.post('/generate-receipt', authenticateToken, (req, res) => {
     if (!fs.existsSync('./receipts')) fs.mkdirSync('./receipts');
 
     doc.pipe(fs.createWriteStream(path));
-
     doc.fontSize(20).text('EduLedger Payment Receipt', { align: 'center' });
     doc.moveDown();
     doc.fontSize(14).text(`Transaction ID: ${transactionId}`);
