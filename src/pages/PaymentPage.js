@@ -1,11 +1,13 @@
 import { useState } from "react";
 import QRCodePayment from "./QRCodePayment";
 import QRCodeScanner from "./QRCodeScanner";
+import Receipt from "./Receipt";
 
 const PaymentPage = () => {
     const [studentId, setStudentId] = useState("");
     const [amount, setAmount] = useState("");
     const [scannedData, setScannedData] = useState(null);
+    const [receiptData, setReceiptData] = useState(null);
 
     const handleScan = (data) => {
         setScannedData(data);
@@ -19,7 +21,16 @@ const PaymentPage = () => {
         });
 
         const result = await response.json();
-        alert(result.message);
+
+        if (result.transactionId) {
+            setReceiptData({
+                studentId: scannedData.studentId,
+                amount: scannedData.amount,
+                transactionId: result.transactionId,
+            });
+        } else {
+            alert("Payment failed. Try again.");
+        }
     };
 
     return (
@@ -29,9 +40,10 @@ const PaymentPage = () => {
                 <QRCodePayment studentId={studentId} amount={amount} />
                 <QRCodeScanner onScan={handleScan} />
             </div>
-            {scannedData && (
+            {scannedData && !receiptData && (
                 <button onClick={processPayment} className="pay-btn">Complete Payment</button>
             )}
+            {receiptData && <Receipt {...receiptData} />}
         </div>
     );
 };

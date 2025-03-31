@@ -7,10 +7,15 @@ const bcrypt = require('bcryptjs');
 const sqlite3 = require('sqlite3').verbose();
 const { 
     Client, PrivateKey, AccountCreateTransaction, 
-    AccountBalanceQuery, TransferTransaction, Hbar 
+    AccountBalanceQuery, TransferTransaction, Hbar,
+    FileCreateTransaction 
 } = require('@hashgraph/sdk');
 const pdf = require('pdfkit');
 const fs = require('fs');
+const WebSocket = require("ws");
+const PDFDocument = require('pdf-lib').PDFDocument;
+const { rgb } = require('pdf-lib');
+const QRCode = require('qrcode');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -70,6 +75,11 @@ const generateToken = (username) => {
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
 
+    // Basic validation
+    if (!username || !password) {
+        return res.status(400).json({ error: 'Username and password are required' });
+    }
+
     db.get("SELECT * FROM users WHERE username = ?", [username], async (err, row) => {
         if (row) return res.status(400).json({ error: 'User already exists' });
 
@@ -90,6 +100,10 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
+    if (!username || !password) {
+        return res.status(400).json({ error: 'Username and password are required' });
+    }
+
     db.get("SELECT * FROM users WHERE username = ?", [username], async (err, user) => {
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(401).json({ error: 'Invalid credentials' });
@@ -103,7 +117,7 @@ app.post('/login', async (req, res) => {
  * Middleware to Authenticate API Requests
  */
 const authenticateToken = (req, res, next) => {
-    const token = req.headers['authorization'];
+    const token = req.headers['authorization'] && req.headers['authorization'].split(' ')[1]; // Handling Bearer token
     if (!token) return res.status(403).json({ error: 'Access denied' });
 
     jwt.verify(token, SECRET_KEY, (err, user) => {
@@ -114,7 +128,55 @@ const authenticateToken = (req, res, next) => {
 };
 
 /**
- * Create a Hedera Account
+ * API to handle payment transactions via Hedera
+ */
+app.post('/hedera-payment', async (req, res) => {
+    const { student_id, amount } = req.body;
+
+    if (!student_id || !amount) {
+        return res.status(400).json({ error: 'Student ID and amount are required' });
+    }
+
+    try {
+        const tinybarAmount = amount * 100000000; // Convert HBAR to tinybars
+
+        // Create transaction
+        const transaction = new TransferTransaction()
+            .addHbarTransfer(process.env.HEDERA_OPERATOR_ID, -tinybarAmount)  // Debit sender
+            .addHbarTransfer(student_id, tinybarAmount);  // Credit student account
+
+        // Sign & execute transaction
+        const txResponse = await transaction.execute(client);
+        const receipt = await txResponse.getReceipt(client);
+
+        if (receipt.status.toString() === "SUCCESS") {
+            // Save payment record in database
+            const sql = "INSERT INTO payments (student_id, amount, transaction_id, status) VALUES (?, ?, ?, ?)";
+            db.run(sql, [student_id, amount, txResponse.transactionId.toString(), "completed"], (err) => {
+                if (err) return res.status(500).json({ error: err.message });
+                res.json({ message: "Payment successful", transactionId: txResponse.transactionId.toString() });
+            });
+        } else {
+            res.status(400).json({ error: "Payment failed", status: receipt.status.toString() });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+/**
+ * WebSocket for live payment updates
+ */
+const wss = new WebSocket.Server({ noServer: true });
+
+wss.on("connection", (ws) => {
+    console.log("Client connected");
+
+    // Here you could add logic for sending live payment updates via WebSocket
+});
+
+/**
+ * Hedera Account Creation Endpoint
  */
 app.post('/create-account', authenticateToken, async (req, res) => {
     try {
@@ -123,7 +185,7 @@ app.post('/create-account', authenticateToken, async (req, res) => {
 
         const transaction = new AccountCreateTransaction()
             .setKey(newPublicKey)
-            .setInitialBalance(new Hbar(10));
+            .setInitialBalance(new Hbar(10)); // Initial balance in HBAR
 
         const response = await transaction.execute(client);
         const receipt = await response.getReceipt(client);
@@ -140,6 +202,36 @@ app.post('/create-account', authenticateToken, async (req, res) => {
         res.status(500).json({ error: 'Error creating Hedera account' });
     }
 });
+
+// PDF Upload to Hedera File Service
+async function uploadToHedera(filePath) {
+    const fileData = fs.readFileSync(filePath);
+    
+    const fileTx = new FileCreateTransaction()
+        .setContents(fileData)
+        .setKeys([client.operatorPublicKey])
+        .setMaxTransactionFee(200000000) // Max fee 2 HBAR
+        .freezeWith(client);
+
+    const fileSign = await fileTx.sign(PrivateKey.fromString(process.env.HEDERA_PRIVATE_KEY));
+    const fileSubmit = await fileSign.execute(client);
+    const fileReceipt = await fileSubmit.getReceipt(client);
+    
+    return fileReceipt.fileId.toString();
+}
+
+// API Endpoint to Upload Receipt
+app.post("/upload-receipt", async (req, res) => {
+    try {
+        const { filePath } = req.body;
+        const fileId = await uploadToHedera(filePath);
+
+        res.json({ message: "File uploaded to Hedera", fileId });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 /**
  * Fetch Account Balance
@@ -184,59 +276,49 @@ app.post('/transfer', authenticateToken, async (req, res) => {
     }
 });
 
-
-const QRCode = require('qrcode');
-
+/**
+ * Generate PDF Receipt for Transaction
+ */
 app.get('/download-receipt/:transactionId', async (req, res) => {
     const { transactionId } = req.params;
 
-    db.query('SELECT * FROM payments WHERE transaction_id = ?', [transactionId], async (err, results) => {
-        if (err || results.length === 0) return res.status(404).json({ error: 'Transaction not found' });
+    db.get('SELECT * FROM transactions WHERE transaction_id = ?', [transactionId], async (err, results) => {
+        if (err || !results) return res.status(404).json({ error: 'Transaction not found' });
 
-        const { student_id, amount, status, timestamp } = results[0];
+        const { from_account, to_account, amount } = results;
+        
+        // Generate a QR code linking to a verification page
+        const qrData = `https://elimuledger.com/verify/${transactionId}`;
+        const qrCode = await QRCode.toDataURL(qrData);
 
-        db.query('SELECT * FROM students WHERE id = ?', [student_id], async (err, studentResults) => {
-            if (err || studentResults.length === 0) return res.status(404).json({ error: 'Student not found' });
+        // Create PDF
+        const pdfDoc = await PDFDocument.create();
+        const page = pdfDoc.addPage([500, 700]);
+        const { width, height } = page.getSize();
+        const fontSize = 18;
 
-            const { school } = studentResults[0];
+        page.drawText('EduLedger Payment Receipt', { x: 50, y: height - 50, size: fontSize, color: rgb(0, 0, 0) });
+        page.drawText(`Transaction ID: ${transactionId}`, { x: 50, y: height - 100, size: 14 });
+        page.drawText(`From: ${from_account}`, { x: 50, y: height - 130, size: 14 });
+        page.drawText(`To: ${to_account}`, { x: 50, y: height - 160, size: 14 });
+        page.drawText(`Amount: ${amount} tinybars`, { x: 50, y: height - 190, size: 14 });
 
-            // Generate a QR code linking to a verification page
-            const qrData = `https://elimuledger.com/verify/${transactionId}`;
-            const qrCode = await QRCode.toDataURL(qrData);
+        // Embed QR Code Image in PDF
+        const qrImageBytes = Buffer.from(qrCode.split(",")[1], "base64");
+        const qrImage = await pdfDoc.embedPng(qrImageBytes);
+        page.drawImage(qrImage, { x: 50, y: height - 300, width: 150, height: 150 });
 
-            // Create PDF
-            const pdfDoc = await PDFDocument.create();
-            const page = pdfDoc.addPage([500, 700]);
-            const { width, height } = page.getSize();
-            const fontSize = 18;
+        page.drawText('Scan to verify transaction', { x: 50, y: height - 320, size: 12 });
 
-            page.drawText('ElimuLedger Payment Receipt', { x: 50, y: height - 50, size: fontSize, color: rgb(0, 0, 0) });
-            page.drawText(`Transaction ID: ${transactionId}`, { x: 50, y: height - 100, size: 14 });
-            page.drawText(`Student ID: ${student_id}`, { x: 50, y: height - 130, size: 14 });
-            page.drawText(`School: ${school}`, { x: 50, y: height - 160, size: 14 });
-            page.drawText(`Amount: ${amount} HBAR`, { x: 50, y: height - 190, size: 14 });
-            page.drawText(`Status: ${status}`, { x: 50, y: height - 220, size: 14 });
-            page.drawText(`Timestamp: ${timestamp}`, { x: 50, y: height - 250, size: 14 });
-
-            // Embed QR Code Image in PDF
-            const qrImageBytes = Buffer.from(qrCode.split(",")[1], "base64");
-            const qrImage = await pdfDoc.embedPng(qrImageBytes);
-            page.drawImage(qrImage, { x: 50, y: height - 450, width: 150, height: 150 });
-
-            page.drawText('Scan to verify transaction', { x: 50, y: height - 470, size: 12 });
-
-            const pdfBytes = await pdfDoc.save();
-            res.setHeader('Content-Type', 'application/pdf');
-            res.setHeader('Content-Disposition', `attachment; filename="receipt_${transactionId}.pdf"`);
-            res.send(pdfBytes);
-        });
+        const pdfBytes = await pdfDoc.save();
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="receipt_${transactionId}.pdf"`);
+        res.send(pdfBytes);
     });
 });
 
-
-
 /**
- * Generate PDF Receipt for Transaction
+ * Generate PDF Receipt for Transaction (Alternative Route)
  */
 app.post('/generate-receipt', authenticateToken, (req, res) => {
     const { transactionId, fromAccountId, toAccountId, amount } = req.body;
@@ -265,14 +347,16 @@ app.post('/generate-receipt', authenticateToken, (req, res) => {
  */
 app.use('/receipts', express.static('receipts'));
 
+/**
+ * Transaction Verification API
+ */
 app.get('/api/verify/:transactionId', (req, res) => {
     const { transactionId } = req.params;
 
-    db.query('SELECT * FROM payments WHERE transaction_id = ?', [transactionId], (err, results) => {
-        if (err || results.length === 0) return res.status(404).json({ error: 'Transaction not found' });
-        res.json(results[0]);
+    db.get('SELECT * FROM transactions WHERE transaction_id = ?', [transactionId], (err, results) => {
+        if (err || !results) return res.status(404).json({ error: 'Transaction not found' });
+        res.json(results);
     });
 });
-
 
 app.listen(PORT, () => console.log(`EduLedger server running on port ${PORT}`));

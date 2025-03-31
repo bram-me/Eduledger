@@ -1,22 +1,23 @@
-import React from "react";
-import jsPDF from "jspdf";
+import React, { useRef } from "react";
+import { useReactToPdf } from "react-to-pdf";
 
-const Receipt = ({ accountId, amount, transactionId }) => {
-  const generatePDF = () => {
-    const doc = new jsPDF();
-    doc.text("EduLedger Payment Receipt", 20, 20);
-    doc.text(`Account ID: ${accountId}`, 20, 30);
-    doc.text(`Amount: ${amount} HBAR`, 20, 40);
-    doc.text(`Transaction ID: ${transactionId}`, 20, 50);
-    doc.save("receipt.pdf");
-  };
+const Receipt = ({ studentId, amount, transactionId }) => {
+    const receiptRef = useRef();
+    const { toPdf } = useReactToPdf({ filename: `EduLedger_Receipt_${transactionId}.pdf` });
 
-  return (
-    <div className="receipt-container">
-      <h2>Download Receipt</h2>
-      <button onClick={generatePDF}>Download</button>
-    </div>
-  );
+    return (
+        <div className="receipt-container">
+            <div ref={receiptRef} className="receipt">
+                <h2>EduLedger Payment Receipt</h2>
+                <p><strong>Transaction ID:</strong> {transactionId}</p>
+                <p><strong>Student ID:</strong> {studentId}</p>
+                <p><strong>Amount Paid:</strong> ${amount}</p>
+                <p><strong>Date:</strong> {new Date().toLocaleString()}</p>
+                <p>Thank you for using EduLedger!</p>
+            </div>
+            <button className="download-btn" onClick={toPdf}>Download Receipt (PDF)</button>
+        </div>
+    );
 };
 
 export default Receipt;

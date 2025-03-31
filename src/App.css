@@ -104,6 +104,20 @@ body {
   }
 }
 
+.payment-status {
+  text-align: center;
+  padding: 20px;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 18px;
+}
+
+.payment-status p {
+  font-weight: bold;
+  color: #333;
+}
+
 
 
 .settings-container {
@@ -274,4 +288,59 @@ button:hover {
   border: 5px solid white;
   padding: 1rem;
   background: white;
+}
+
+.payment-page {
+  text-align: center;
+  padding: 20px;
+}
+
+.qr-section {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.pay-btn {
+  background: #28a745;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.pay-btn:hover {
+  background: #218838;
+}
+
+.receipt-container {
+  text-align: center;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+}
+
+.receipt {
+  padding: 15px;
+  border: 1px solid #ccc;
+  background: #f8f9fa;
+  width: 80%;
+  margin: 0 auto;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.download-btn {
+  margin-top: 10px;
+  background: #007bff;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.download-btn:hover {
+  background: #0056b3;
 }
