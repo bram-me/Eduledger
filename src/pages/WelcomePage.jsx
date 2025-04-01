@@ -4,27 +4,35 @@ import "../App.css";  // Import for global styles (app.css)
 import "./Welcomepage.css";  // Import for specific styles (welcomepage.css)
 import { motion } from "framer-motion";
 import { FaGraduationCap, FaLock, FaChartBar, FaRegCheckCircle, FaCertificate, FaWallet, FaHistory, FaCog } from "react-icons/fa";
+import edulegderIcon from '../assets/edulegder-icon.svg';
 
 const WelcomePage = () => {
   return (
     <div className="min-h-screen p-6 bg-gray-100">
       {/* Hero Section */}
       <motion.div
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
-        className="hero text-center mb-12"
-      >
-        <h1 className="text-5xl font-bold">Welcome to EduLedger</h1>
-        <p className="text-lg mt-4 text-gray-600">
-          A next-generation blockchain-powered school management system.
-        </p>
-        <Link to="/dashboard">
-          <button className="get-started-btn mt-6">
-            Get Started
-          </button>
-        </Link>
-      </motion.div>
+  initial={{ opacity: 0, y: -50 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 1 }}
+  className="hero text-center mb-16"
+>
+  {/* EduLedger Logo */}
+  <div className="logo-container">
+  <img src={edulegderIcon} alt="EduLedger Logo" className="eduledger-logo" />
+</div>
+
+  <h1 className="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#2D91B9] to-[#61C1A2]">
+    Welcome to EduLedger
+  </h1>
+  <p className="text-xl mt-4 text-gray-700 max-w-3xl mx-auto">
+    A next-generation blockchain-powered school management system that empowers educational institutions with secure, decentralized, and efficient record-keeping, payments, and more.
+  </p>
+  <Link to="/dashboard">
+    <button className="get-started-btn mt-8 py-3 px-8 bg-[#2D91B9] hover:bg-[#1C6B81] text-white font-semibold rounded-lg shadow-lg transition-all duration-300">
+      Get Started
+    </button>
+  </Link>
+</motion.div>
 
       {/* Features Section */}
       <div className="features grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">

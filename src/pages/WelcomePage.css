@@ -89,6 +89,24 @@
   cursor: pointer;
 }
 
+/* Styling for EduLedger Logo */
+.eduledger-logo {
+  width: 120px; /* Adjust size based on preference */
+  height: auto;
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+  margin-bottom: 20px;
+}
+
+/* Logo container in Hero Section */
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
 
 /* Responsive Design for Mobile */
 @media (max-width: 768px) {
