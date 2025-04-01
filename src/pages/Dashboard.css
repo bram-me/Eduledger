@@ -17,7 +17,7 @@ body {
 /* Sidebar */
 .sidebar {
   width: 250px;
-  background-color: #15263f;
+  background: linear-gradient(135deg, #1d3b58, #15263f);
   height: 100vh;
   color: white;
   padding: 20px;
@@ -25,19 +25,34 @@ body {
   left: 0;
   top: 0;
   transition: all 0.3s ease;
+  box-shadow: 2px 0px 8px rgba(0, 0, 0, 0.2);
 }
 
 .sidebar:hover {
   width: 280px;
 }
 
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+  color: white;
+}
+
+.sidebar-header h2 {
+  font-size: 1.8rem;
+  margin-left: 10px;
+}
+
 .sidebar a {
   display: block;
   color: white;
   text-decoration: none;
-  padding: 10px 15px;
-  margin: 10px 0;
-  border-radius: 5px;
+  padding: 12px 20px;
+  margin: 8px 0;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
   transition: all 0.3s ease;
 }
 
@@ -47,6 +62,59 @@ body {
   transform: scale(1.05);
 }
 
+/* Sidebar Collapsed State */
+.sidebar-nav .collapsed {
+  display: none;
+}
+
+.sidebar-nav .collapsed.visible {
+  display: block;
+}
+
+/* Sidebar Section Header */
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.sidebar-item:hover {
+  background-color: #1e3a5f;
+  transform: scale(1.05);
+}
+
+.sidebar-item span {
+  margin-right: 10px;
+}
+
+.sidebar-item svg {
+  font-size: 1.3rem;
+}
+
+/* Sidebar Submenu */
+.sidebar-submenu {
+  padding-left: 20px;
+  /* display: none; */
+}
+
+.sidebar-submenu.visible {
+  display: block;
+}
+
+/* Sidebar Bottom Section */
+.sidebar-footer {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
 /* Main Content */
 .main-content {
   margin-left: 260px;
@@ -54,7 +122,6 @@ body {
   transition: all 0.3s ease;
 }
 
-/* Header */
 h1, h2, h3 {
   font-weight: 700;
   color: #333;
@@ -81,20 +148,20 @@ h1, h2, h3 {
   box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
 }
 
-.card-blue { 
-  background: linear-gradient(145deg, #007bff, #0056b3); 
-  color: white; 
+.card-blue {
+  background: linear-gradient(145deg, #007bff, #0056b3);
+  color: white;
 }
-.card-green { 
-  background: linear-gradient(145deg, #28a745, #218838); 
-  color: white; 
+.card-green {
+  background: linear-gradient(145deg, #28a745, #218838);
+  color: white;
 }
-.card-yellow { 
-  background: linear-gradient(145deg, #ffc107, #e0a800); 
-  color: black; 
+.card-yellow {
+  background: linear-gradient(145deg, #ffc107, #e0a800);
+  color: black;
 }
 
-/* Table */
+/* Table Styles */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -127,8 +194,14 @@ tr:hover {
   display: inline-block;
 }
 
-.badge-paid { background-color: #28a745; color: white; }
-.badge-pending { background-color: #ffc107; color: black; }
+.badge-paid {
+  background-color: #28a745;
+  color: white;
+}
+.badge-pending {
+  background-color: #ffc107;
+  color: black;
+}
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -145,5 +218,11 @@ tr:hover {
 
   .dashboard-cards {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 992px) {
+  .dashboard-cards {
+    grid-template-columns: repeat(2, 1fr);
   }
 }

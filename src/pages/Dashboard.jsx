@@ -1,47 +1,156 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet, Link } from "react-router-dom";
-import { FaUserGraduate, FaMoneyBill, FaDatabase, FaSchool, FaWallet, FaHistory, FaCog, FaCertificate } from "react-icons/fa";
+import { FaUserGraduate, FaMoneyBill, FaDatabase, FaWallet, FaHistory, FaCog, FaCertificate, FaAngleDown, FaAngleUp } from "react-icons/fa";
 import "./Dashboard.css";
 
 const Dashboard = () => {
+  const [collapsed, setCollapsed] = useState({
+    studentRecords: false,
+    payment: false,
+    voting: false,
+    nftAchievement: false,
+    certifications: false,
+    wallet: false,
+    transactionHistory: false,
+    settings: false,
+  });
+
+  // Load collapsed state from localStorage
+  useEffect(() => {
+    const savedState = JSON.parse(localStorage.getItem("sidebarState"));
+    if (savedState) {
+      setCollapsed(savedState);
+    }
+  }, []);
+
+  // Save collapsed state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("sidebarState", JSON.stringify(collapsed));
+  }, [collapsed]);
+
+  const toggleSidebarItem = (item) => {
+    setCollapsed((prevState) => ({
+      ...prevState,
+      [item]: !prevState[item],
+    }));
+  };
+
   return (
     <div className="flex">
       {/* Sidebar */}
       <div className="sidebar">
         <div className="sidebar-header flex items-center mb-6">
-          <FaSchool className="text-white text-3xl mr-2" />
-          <h2 className="text-2xl font-bold text-white">EduLedger</h2>
+          <img src="../assets/edulegder-icon.svg" alt="EduLedger Icon" className="text-white text-3xl mr-2" />
+          <h2 className="text-white text-2xl font-bold">EduLedger</h2>
         </div>
-        <Link to="/dashboard">Dashboard</Link>
-        <Link to="/dashboard/student-records">Students</Link>
-        <Link to="/dashboard/payment">Payments</Link>
-        <Link to="/dashboard/voting">
-          <FaCertificate className="mr-2" />Voting System
-        </Link>
-        <Link to="/dashboard/nft-achievement">
-          <FaCertificate className="mr-2" />NFT Achievements
-        </Link>
-        <Link to="/dashboard/certifications">
-          <FaCertificate className="mr-2" />Certification Manager
-        </Link>
-        <Link to="/dashboard/wallet">
-          <FaWallet className="mr-2" />Wallet
-        </Link>
-        <Link to="/dashboard/transaction-history">
-          <FaHistory className="mr-2" />Transactions
-        </Link>
-        <Link to="/dashboard/settings">
-          <FaCog className="mr-2" />Settings
-        </Link>
+        <nav className="sidebar-nav">
+          <Link to="/dashboard" className="sidebar-link">Home</Link>
+          
+          <div className="sidebar-section">
+            <div className="sidebar-item" onClick={() => toggleSidebarItem("studentRecords")}>
+              <FaUserGraduate className="mr-2" />Students
+              {collapsed.studentRecords ? <FaAngleDown className="ml-auto" /> : <FaAngleUp className="ml-auto" />}
+            </div>
+            {!collapsed.studentRecords && (
+              <div className="sidebar-submenu">
+                <Link to="/dashboard/student-records" className="sidebar-link">View Students</Link>
+              </div>
+            )}
+          </div>
+
+          <div className="sidebar-section">
+            <div className="sidebar-item" onClick={() => toggleSidebarItem("payment")}>
+              <FaMoneyBill className="mr-2" />Payments
+              {collapsed.payment ? <FaAngleDown className="ml-auto" /> : <FaAngleUp className="ml-auto" />}
+            </div>
+            {!collapsed.payment && (
+              <div className="sidebar-submenu">
+                <Link to="/dashboard/payment" className="sidebar-link">View Payments</Link>
+              </div>
+            )}
+          </div>
+
+          <div className="sidebar-section">
+            <div className="sidebar-item" onClick={() => toggleSidebarItem("voting")}>
+              <FaCertificate className="mr-2" />Voting System
+              {collapsed.voting ? <FaAngleDown className="ml-auto" /> : <FaAngleUp className="ml-auto" />}
+            </div>
+            {!collapsed.voting && (
+              <div className="sidebar-submenu">
+                <Link to="/dashboard/voting" className="sidebar-link">View Voting</Link>
+              </div>
+            )}
+          </div>
+
+          <div className="sidebar-section">
+            <div className="sidebar-item" onClick={() => toggleSidebarItem("nftAchievement")}>
+              <FaCertificate className="mr-2" />NFT Achievements
+              {collapsed.nftAchievement ? <FaAngleDown className="ml-auto" /> : <FaAngleUp className="ml-auto" />}
+            </div>
+            {!collapsed.nftAchievement && (
+              <div className="sidebar-submenu">
+                <Link to="/dashboard/nft-achievement" className="sidebar-link">View NFT Achievements</Link>
+              </div>
+            )}
+          </div>
+
+          <div className="sidebar-section">
+            <div className="sidebar-item" onClick={() => toggleSidebarItem("certifications")}>
+              <FaCertificate className="mr-2" />Certification Manager
+              {collapsed.certifications ? <FaAngleDown className="ml-auto" /> : <FaAngleUp className="ml-auto" />}
+            </div>
+            {!collapsed.certifications && (
+              <div className="sidebar-submenu">
+                <Link to="/dashboard/certifications" className="sidebar-link">View Certifications</Link>
+              </div>
+            )}
+          </div>
+
+          <div className="sidebar-section">
+            <div className="sidebar-item" onClick={() => toggleSidebarItem("wallet")}>
+              <FaWallet className="mr-2" />Wallet
+              {collapsed.wallet ? <FaAngleDown className="ml-auto" /> : <FaAngleUp className="ml-auto" />}
+            </div>
+            {!collapsed.wallet && (
+              <div className="sidebar-submenu">
+                <Link to="/dashboard/wallet" className="sidebar-link">View Wallet</Link>
+              </div>
+            )}
+          </div>
+
+          <div className="sidebar-section">
+            <div className="sidebar-item" onClick={() => toggleSidebarItem("transactionHistory")}>
+              <FaHistory className="mr-2" />Transactions
+              {collapsed.transactionHistory ? <FaAngleDown className="ml-auto" /> : <FaAngleUp className="ml-auto" />}
+            </div>
+            {!collapsed.transactionHistory && (
+              <div className="sidebar-submenu">
+                <Link to="/dashboard/transaction-history" className="sidebar-link">View Transactions</Link>
+              </div>
+            )}
+          </div>
+
+          <div className="sidebar-section">
+            <div className="sidebar-item" onClick={() => toggleSidebarItem("settings")}>
+              <FaCog className="mr-2" />Settings
+              {collapsed.settings ? <FaAngleDown className="ml-auto" /> : <FaAngleUp className="ml-auto" />}
+            </div>
+            {!collapsed.settings && (
+              <div className="sidebar-submenu">
+                <Link to="/dashboard/settings" className="sidebar-link">View Settings</Link>
+              </div>
+            )}
+          </div>
+        </nav>
       </div>
 
       {/* Main Content */}
       <div className="main-content">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <h1 className="text-3xl font-bold">Home</h1>
         <div className="bg-white p-6 rounded-xl shadow-md mt-4">
           <h2 className="text-xl font-semibold">Welcome back, Admin!</h2>
           <p>Here is an overview of activities in your school.</p>
-          <div className="dashboard-cards grid grid-cols-3 gap-4 mt-4">
+          <div className="dashboard-cards grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
             <div className="dashboard-card card-blue">
               <FaUserGraduate className="text-2xl mr-2" />
               <div>
@@ -64,37 +173,6 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-md mt-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">Students</h2>
-            <Link to="/dashboard/students" className="text-blue-500">View All</Link>
-          </div>
-          <table className="w-full mt-4 border-collapse">
-            <thead>
-              <tr className="border-b">
-                <th className="text-left p-2">Name</th>
-                <th className="text-left p-2">Class</th>
-                <th className="text-left p-2">School</th>
-                <th className="text-left p-2">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {["Emily Johnson", "Michael Smith", "Sarah Brown", "David Wilson"].map((student, index) => (
-                <tr key={index} className="border-b">
-                  <td className="p-2">{student}</td>
-                  <td className="p-2">Grade {10 + index}</td>
-                  <td className="p-2">Greenwood High</td>
-                  <td className="p-2">
-                    <span className={`badge ${index % 2 === 0 ? "badge-paid" : "badge-pending"}`}>
-                      {index % 2 === 0 ? "Paid" : "Pending"}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
 
         {/* Outlet for Nested Routes - Render specific components */}
