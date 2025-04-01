@@ -1,6 +1,6 @@
 # EduLedger - School Admin System
 
-EduLedger is a comprehensive school administration system designed to manage various aspects of an educational institution. It allows administrators to manage student records, payments, certifications, wallet, transactions, voting, and NFT achievements, all in one platform. EduLedger uses modern technologies to ensure a sleek and efficient experience for administrators.
+[EduLedger](https://eduledger.netlify.app/) is a comprehensive school administration system designed to manage various aspects of an educational institution. It allows administrators to manage student records, payments, certifications, wallet, transactions, voting, and NFT achievements, all in one platform. EduLedger uses modern technologies to ensure a sleek and efficient experience for administrators.
 
 ---
 
