@@ -22,7 +22,7 @@ const WelcomePage = () => {
 </div>
 
   <h1 className="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#2D91B9] to-[#61C1A2]">
-    Welcome to EduLedger
+    EduLedger
   </h1>
   <p className="text-xl mt-4 text-gray-700 max-w-3xl mx-auto">
     A next-generation blockchain-powered school management system that empowers educational institutions with secure, decentralized, and efficient record-keeping, payments, and more.
