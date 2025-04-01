@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "../App.css";  // Import for global styles (app.css)
-import "./Welcomepage.css";  // Import for specific styles (welcomepage.css)
+import "./WelcomePage.css";  // Import for specific styles (welcomepage.css)
 import { motion } from "framer-motion";
 import { FaGraduationCap, FaLock, FaChartBar, FaRegCheckCircle, FaCertificate, FaWallet, FaHistory, FaCog } from "react-icons/fa";
 import edulegderIcon from '../assets/edulegder-icon.svg';
