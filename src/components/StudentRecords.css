@@ -1,0 +1,54 @@
+/* StudentRecords.css */
+.student-records {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .search-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .search-bar input {
+    padding: 10px;
+    width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .search-icon {
+    font-size: 1.2rem;
+    margin-left: 10px;
+  }
+  
+  .student-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .student-table th, .student-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .student-table tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .edit-icon, .delete-icon {
+    margin-left: 10px;
+    cursor: pointer;
+  }
+  
+  .edit-icon:hover {
+    color: #4caf50;
+  }
+  
+  .delete-icon:hover {
+    color: #e53935;
+  }
+  

@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet, Link } from "react-router-dom";
-import { FaUserGraduate, FaMoneyBill, FaDatabase, FaSchool, FaWallet, FaHistory, FaCog } from "react-icons/fa";
+import { FaUserGraduate, FaMoneyBill, FaDatabase, FaSchool, FaWallet, FaHistory, FaCog, FaCertificate } from "react-icons/fa";
 import "./Dashboard.css";
 
 const Dashboard = () => {
@@ -12,12 +12,27 @@ const Dashboard = () => {
           <FaSchool className="text-white text-3xl mr-2" />
           <h2 className="text-2xl font-bold text-white">EduLedger</h2>
         </div>
-        <Link to="/">Dashboard</Link>
-        <Link to="/students">Students</Link>
-        <Link to="/payments">Payments</Link>
-        <Link to="/wallet"><FaWallet className="mr-2" />Wallet</Link>
-        <Link to="/transaction-history"><FaHistory className="mr-2" />Transactions</Link>
-        <Link to="/settings"><FaCog className="mr-2" />Settings</Link>
+        <Link to="/dashboard">Dashboard</Link>
+        <Link to="/dashboard/students">Students</Link>
+        <Link to="/dashboard/payment">Payments</Link>
+        <Link to="/dashboard/voting">
+          <FaCertificate className="mr-2" />Voting System
+        </Link>
+        <Link to="/dashboard/nft-achievement">
+          <FaCertificate className="mr-2" />NFT Achievements
+        </Link>
+        <Link to="/dashboard/certifications">
+          <FaCertificate className="mr-2" />Certification Manager
+        </Link>
+        <Link to="/dashboard/wallet">
+          <FaWallet className="mr-2" />Wallet
+        </Link>
+        <Link to="/dashboard/transaction-history">
+          <FaHistory className="mr-2" />Transactions
+        </Link>
+        <Link to="/dashboard/settings">
+          <FaCog className="mr-2" />Settings
+        </Link>
       </div>
 
       {/* Main Content */}
@@ -50,10 +65,11 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+
         <div className="bg-white p-6 rounded-xl shadow-md mt-6">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">Students</h2>
-            <Link to="/students" className="text-blue-500">View All</Link>
+            <Link to="/dashboard/students" className="text-blue-500">View All</Link>
           </div>
           <table className="w-full mt-4 border-collapse">
             <thead>
@@ -81,7 +97,7 @@ const Dashboard = () => {
           </table>
         </div>
 
-        {/* Outlet for Nested Routes */}
+        {/* Outlet for Nested Routes - Render specific components */}
         <Outlet />
       </div>
     </div>

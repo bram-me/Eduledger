@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Client, AccountBalanceQuery, TransferTransaction, Hbar } from "@hashgraph/sdk";
+import VerifyTransaction from "./VerifyTransaction";  // Import VerifyTransaction
+import TransactionHistory from "./TransactionHistory"; // Import TransactionHistory
 
 const Wallet = () => {
   const [balance, setBalance] = useState(0);
@@ -63,6 +65,12 @@ const Wallet = () => {
         <button onClick={fetchBalance} disabled={loading}>Refresh Balance</button>
         <button onClick={sendPayment} disabled={loading}>Send 1 HBAR</button>
       </div>
+
+      {/* Verify Transaction Component */}
+      <VerifyTransaction />
+
+      {/* Transaction History Component */}
+      <TransactionHistory />
     </div>
   );
 };

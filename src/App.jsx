@@ -1,22 +1,20 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Buffer } from 'buffer';
+global.Buffer = Buffer;
 
 // Import pages
 import Dashboard from "./pages/Dashboard";
-import Payments from "./pages/Payments";
 import WelcomePage from "./pages/WelcomePage";
 
 // Import components
-import Payment from "./components/Payment";
-import PaymentHistory from "./components/PaymentHistory";
-import PaymentStatus from "./components/PaymentStatus";
-import QrPayment from "./components/QrPayment";
-import Receipt from "./components/Receipt";
-import ReceiptDownload from "./components/ReceiptDownload";
+import Payment from "./components/Payment";  // Payment includes PaymentHistory, PaymentStatus, etc.
+import Wallet from "./components/Wallet";    // Wallet includes TransactionHistory, VerifyTransaction, etc.
 import Settings from "./components/Settings";
-import TransactionHistory from "./components/TransactionHistory";
-import VerifyTransaction from "./components/VerifyTransaction";
-import Wallet from "./components/Wallet";
+import StudentRecords from "./components/StudentRecords"; // New component
+import VotingSystem from "./components/VotingSystem"; // New component
+import NFTAchievement from "./components/NFTAchievement"; // New component
+import CertificationManager from "./components/CertificationManager"; // New component
 
 // Import styles
 import "./App.css"; // Global styles
@@ -26,17 +24,15 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<WelcomePage />} />
-        <Route path="/dashboard" element={<Dashboard />}>
-          <Route path="payments" element={<Payments />} />
-          <Route path="payments/qr" element={<QrPayment />} />
-          <Route path="payments/history" element={<PaymentHistory />} />
-          <Route path="payments/status" element={<PaymentStatus />} />
+        <Route path="/dashboard" element={<Dashboard />} >
+          {/* Nested routes inside Dashboard */}
+          <Route path="payment" element={<Payment />} />
           <Route path="wallet" element={<Wallet />} />
-          <Route path="transaction-history" element={<TransactionHistory />} />
-          <Route path="verify-transaction" element={<VerifyTransaction />} />
           <Route path="settings" element={<Settings />} />
-          <Route path="receipt" element={<Receipt />} />
-          <Route path="receipt/download" element={<ReceiptDownload />} />
+          <Route path="student-records" element={<StudentRecords />} /> {/* Student Records */}
+          <Route path="voting" element={<VotingSystem />} /> {/* Voting System */}
+          <Route path="nft-achievement" element={<NFTAchievement />} /> {/* NFT Achievement */}
+          <Route path="certifications" element={<CertificationManager />} /> {/* Certification Management */}
         </Route>
       </Routes>
     </Router>

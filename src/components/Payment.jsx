@@ -1,21 +1,28 @@
-import { useState } from "react";
-import QRCodePayment from "./QrPayment";
-// import QRCodeScanner from "./QRCodeScanner";
+import React, { useState } from "react";
+import PaymentStatus from "./PaymentStatus";
+import Receipt from "./Receipt";
+import QrPayment from "./QrPayment";
+import QrCodeScanner from "./QrCodeScanner";
+import ReceiptDownload from "./ReceiptDownload";
 
-const PaymentPage = () => {
+const Payment = () => {
     const [studentId, setStudentId] = useState("");
     const [amount, setAmount] = useState("");
+    const [transactionId, setTransactionId] = useState(null);
     const [scannedData, setScannedData] = useState(null);
 
     const handleScan = (data) => {
         setScannedData(data);
+        // Optionally process the scanned data to extract student details or transaction info
+        setTransactionId(data.transactionId); // Adjust based on your QR data format
     };
 
-    const processPayment = async () => {
+    const handlePaymentProcess = async () => {
+        // Here you can initiate the payment process (this is an example)
         const response = await fetch("/hedera-payment", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(scannedData),
+            body: JSON.stringify({ studentId, amount, transactionId: scannedData.transactionId }), // Adjust based on scanned data
         });
 
         const result = await response.json();
@@ -23,17 +30,34 @@ const PaymentPage = () => {
     };
 
     return (
-        <div className="payment-page">
-            <h1>EduLedger Payments</h1>
+        <div className="payment-component">
+            <h1>Payment Section</h1>
+
+            {/* QR Payment Section */}
             <div className="qr-section">
-                <QRCodePayment studentId={studentId} amount={amount} />
-                <QRCodeScanner onScan={handleScan} />
+                <QrPayment studentId={studentId} amount={amount} />
+                <QrCodeScanner onScan={handleScan} />
             </div>
+
+            {/* Payment Status */}
+            <PaymentStatus />
+
+            {/* Receipt and Download */}
+            {transactionId && (
+                <>
+                    <Receipt studentId={studentId} amount={amount} transactionId={transactionId} />
+                    <ReceiptDownload />
+                </>
+            )}
+
+            {/* Complete Payment Button */}
             {scannedData && (
-                <button onClick={processPayment} className="pay-btn">Complete Payment</button>
+                <button onClick={handlePaymentProcess} className="pay-btn">
+                    Complete Payment
+                </button>
             )}
         </div>
     );
 };
 
-export default PaymentPage;
+export default Payment;

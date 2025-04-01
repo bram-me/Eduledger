@@ -1,6 +1,6 @@
 import { useState } from "react";
 import QRCodePayment from "../components/QrPayment";
-// import QRCodeScanner from "..components/QRCodeScanner";
+import QRCodeScanner from "../components/QrCodeScanner";
 import Receipt from "../components/Receipt";
 
 const PaymentPage = () => {
