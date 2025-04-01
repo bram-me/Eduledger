@@ -26,17 +26,18 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<WelcomePage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/payments" element={<Payments />} />
-        <Route path="/payments/qr" element={<QrPayment />} />
-        <Route path="/payments/history" element={<PaymentHistory />} />
-        <Route path="/payments/status" element={<PaymentStatus />} />
-        <Route path="/wallet" element={<Wallet />} />
-        <Route path="/transaction-history" element={<TransactionHistory />} />
-        <Route path="/verify-transaction" element={<VerifyTransaction />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/receipt" element={<Receipt />} />
-        <Route path="/receipt/download" element={<ReceiptDownload />} />
+        <Route path="/dashboard" element={<Dashboard />}>
+          <Route path="payments" element={<Payments />} />
+          <Route path="payments/qr" element={<QrPayment />} />
+          <Route path="payments/history" element={<PaymentHistory />} />
+          <Route path="payments/status" element={<PaymentStatus />} />
+          <Route path="wallet" element={<Wallet />} />
+          <Route path="transaction-history" element={<TransactionHistory />} />
+          <Route path="verify-transaction" element={<VerifyTransaction />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="receipt" element={<Receipt />} />
+          <Route path="receipt/download" element={<ReceiptDownload />} />
+        </Route>
       </Routes>
     </Router>
   );
