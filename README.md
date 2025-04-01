@@ -19,7 +19,9 @@ EduLedger is a comprehensive school administration system designed to manage var
 
 ## Overview
 
-EduLedger offers a suite of tools that make managing school operations seamless and more efficient. The platform provides a centralized hub for administrators to manage everything from student data and payment processing to certifications and voting systems. It features a modern, responsive UI, integrated with a backend to handle complex functionalities.
+EduLedger offers a suite of tools that make managing school operations seamless and more efficient. The platform provides a centralized hub for administrators to manage everything from student data and payment processing to certifications and voting systems. It features a modern, responsive UI, integrated with a backend to handle complex functionalities. 
+
+One key aspect of the system is its integration with the **Hedera ecosystem**, which powers the blockchain-based features such as **NFT achievements** and **tokenization**.
 
 ---
 
@@ -27,7 +29,7 @@ EduLedger offers a suite of tools that make managing school operations seamless 
 
 - **Student Records**: Manage and view student details and academic information.
 - **Payments**: Track and manage student payments, fees, and transactions.
-- **NFT Achievements**: Integrate blockchain-based NFTs for student achievements and milestones.
+- **NFT Achievements**: Integrate blockchain-based NFTs for student achievements and milestones using the **Hedera ecosystem**.
 - **Voting System**: A system for conducting secure voting within the institution.
 - **Certifications**: Issue and manage student certifications in a digital format.
 - **Wallet**: Manage financial transactions, including deposits and withdrawals, using a digital wallet.
@@ -53,7 +55,7 @@ EduLedger uses the following technologies:
   - MongoDB (for database management)
 
 - **Blockchain**:
-  - Hedera Hashgraph (for NFT and tokenization features)
+  - **Hedera Hashgraph** (for NFT achievements and tokenization features)
 
 ---
 
@@ -74,4 +76,4 @@ Before starting, make sure you have the following installed:
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/yourusername/eduledger.git
+   git clone https://github.com/bram-me/eduledger.git
