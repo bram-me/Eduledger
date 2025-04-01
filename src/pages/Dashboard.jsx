@@ -13,7 +13,7 @@ const Dashboard = () => {
           <h2 className="text-2xl font-bold text-white">EduLedger</h2>
         </div>
         <Link to="/dashboard">Dashboard</Link>
-        <Link to="/dashboard/students">Students</Link>
+        <Link to="/dashboard/student-records">Students</Link>
         <Link to="/dashboard/payment">Payments</Link>
         <Link to="/dashboard/voting">
           <FaCertificate className="mr-2" />Voting System
