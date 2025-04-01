@@ -40,7 +40,7 @@ const Dashboard = () => {
       {/* Sidebar */}
       <div className="sidebar">
         <div className="sidebar-header flex items-center mb-6">
-          <img src="../assets/edulegder-icon.svg" alt="EduLedger Icon" className="text-white text-3xl mr-2" />
+          <img src="./assets/edulegder-icon.svg" alt="EduLedger Icon" className="text-white text-3xl mr-2" />
           <h2 className="text-white text-2xl font-bold">EduLedger</h2>
         </div>
         <nav className="sidebar-nav">
