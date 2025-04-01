@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Client, TransferTransaction, Hbar } from "@hashgraph/sdk";
 import { FaSearch } from "react-icons/fa";
+import { saveAs } from "file-saver"; // To save CSV file
 import "./CertificationManager.css";
 
 const CertificationManager = () => {
@@ -8,7 +9,8 @@ const CertificationManager = () => {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
-  const certificatesPerPage = 5; // Number of certificates per page
+  const [selectedCertificate, setSelectedCertificate] = useState(null); // For modal
+  const certificatesPerPage = 5;
 
   const accountId = process.env.HEDERA_ACCOUNT_ID;
   const privateKey = process.env.HEDERA_PRIVATE_KEY;
@@ -54,6 +56,33 @@ const CertificationManager = () => {
     page * certificatesPerPage
   );
 
+  // Function to export certificates to CSV
+  const exportCertificatesToCSV = () => {
+    const csvData = [
+      ["Student ID", "Course", "Issue Date", "Status"], // CSV Header
+      ...certificates.map(cert => [
+        cert.studentId,
+        cert.course,
+        cert.date,
+        cert.status,
+      ]),
+    ];
+
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvData.forEach((rowArray) => {
+      const row = rowArray.join(",");
+      csvContent += row + "\r\n";
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    saveAs(encodedUri, "certificates.csv"); // Save as CSV
+  };
+
+  // Function to handle certificate click and show details
+  const handleCertificateClick = (cert) => {
+    setSelectedCertificate(cert);
+  };
+
   return (
     <div className="certification-manager">
       <h2 className="title">Certification Management</h2>
@@ -76,6 +105,11 @@ const CertificationManager = () => {
         {loading ? "Issuing..." : "Issue Certificate"}
       </button>
 
+      {/* Export to CSV Button */}
+      <button onClick={exportCertificatesToCSV} className="export-button">
+        Export Certificates to CSV
+      </button>
+
       <div className="certificate-list">
         {loading ? (
           <div className="loading">Issuing certificate... Please wait.</div>
@@ -83,7 +117,7 @@ const CertificationManager = () => {
           <>
             <ul>
               {currentCertificates.map((cert, index) => (
-                <li key={index} className="certificate-item">
+                <li key={index} className="certificate-item" onClick={() => handleCertificateClick(cert)}>
                   <span className="certificate-id">Student ID: {cert.studentId}</span>
                   <span className="certificate-course">Course: {cert.course}</span>
                   <span className="certificate-date">Issued on: {cert.date}</span>
@@ -109,8 +143,25 @@ const CertificationManager = () => {
           </>
         )}
       </div>
+
+      {/* Certificate Detail Modal */}
+      {selectedCertificate && (
+        <div className="certificate-modal">
+          <div className="modal-content">
+            <h3>Certificate Details</h3>
+            <p><strong>Student ID:</strong> {selectedCertificate.studentId}</p>
+            <p><strong>Course:</strong> {selectedCertificate.course}</p>
+            <p><strong>Issued on:</strong> {selectedCertificate.date}</p>
+            <p><strong>Status:</strong> {selectedCertificate.status}</p>
+            <button onClick={() => setSelectedCertificate(null)} className="close-modal-button">
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default CertificationManager;
+
