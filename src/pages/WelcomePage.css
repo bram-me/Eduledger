@@ -1,79 +1,56 @@
-/* Welcomepage.css */
-
 /* General Styles */
 .hero {
-  background-color: #1a202c;
-  color: white;
-  padding: 60px 20px;
-  border-radius: 10px;
-}
-
-.get-started-btn {
-  background-color: #2b6cb0;
-  color: white;
-  padding: 10px 20px;
-  font-size: 18px;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-}
-
-.get-started-btn:hover {
-  background-color: #3182ce;
-}
-
-.features {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 24px;
-  margin-top: 40px;
-}
-
-.feature-box {
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.feature-box h2 {
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.feature-box p {
-  color: #6b7280;
-}
-
-.feature-box:hover {
-  transform: translateY(-5px);
-  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
-}
-
-/* Welcomepage.css */
-
-/* Hero Section */
-.hero {
-  padding: 40px 0;
   background: linear-gradient(to bottom, #2d91b9, #61c1a2);
   color: white;
+  padding: 60px 20px;
   border-radius: 20px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  position: relative;
+  text-align: center;
 }
 
-/* Feature Card Styling */
-.feature-box {
-  background: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+.hero::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: -1;
 }
 
-.feature-box:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+.hero .logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
+.eduledger-logo {
+  width: 150px; /* Adjust size for better positioning */
+  height: auto;
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Hero Section Content */
+.hero h1 {
+  font-size: 3.5rem;
+  font-weight: 900;
+  margin: 20px 0;
+}
+
+.hero p {
+  font-size: 1.25rem;
+  max-width: 650px;
+  margin: 0 auto;
+  color: #d1d5db;
+  padding-bottom: 20px;
+}
+
+/* Get Started Button */
 .get-started-btn {
   padding: 12px 24px;
   background-color: #2d91b9;
@@ -89,28 +66,157 @@
   cursor: pointer;
 }
 
-/* Styling for EduLedger Logo */
-.eduledger-logo {
-  width: 120px; /* Adjust size based on preference */
-  height: auto;
-  max-width: 100%;
-  border-radius: 8px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
-  margin-bottom: 20px;
+/* Feature Cards Section */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Improved responsiveness */
+  gap: 24px;
+  margin-top: 40px;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
-/* Logo container in Hero Section */
-.logo-container {
+.feature-box {
+  background-color: white;
+  padding: 20px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.feature-box:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.feature-box h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.feature-box p {
+  color: #6b7280;
+}
+
+/* Testimonial Section */
+.testimonial-section {
+  background-color: #f0f4f8;
+  padding: 40px 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 60px;
+}
+
+.testimonial-card {
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Floating Contact Button */
+.contact-btn {
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3);
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 50;
+}
+
+.contact-btn:hover {
+  background-color: #1c6b81;
+}
+
+/* Responsive Design for Mobile */
+@media (max-width: 768px) {
+  .hero {
+    padding: 40px 20px;
+  }
+
+  .features {
+    grid-template-columns: 1fr;
+  }
+
+  .get-started-btn {
+    width: 100%;
+  }
+
+  .hero h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero p {
+    font-size: 1rem;
+    max-width: 90%;
+  }
+}
+
+/* Additional Hero Section Customization */
+.hero {
+  padding: 4rem 2rem;
+}
+
+.hero::after {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.testimonial-section {
+  margin-top: 40px;
+}
+
+.testimonial-card {
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.contact-btn {
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.contact-btn:hover {
+  background-color: #1c6b81;
+}
+
+/* Hero Section Customization */
+.hero {
+  position: relative;
+  padding: 4rem 2rem;
+}
+
+.hero .logo-container {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-bottom: 20px;
 }
 
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 900;
+  margin: 20px 0;
+}
 
-/* Responsive Design for Mobile */
-@media (max-width: 768px) {
-  .features {
-    grid-template-columns: 1fr;
-  }
+.hero p {
+  font-size: 1.25rem;
+  max-width: 650px;
+  margin: 0 auto;
+  color: #d1d5db;
+  padding-bottom: 20px;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Improved responsiveness */
+  gap: 24px;
+  margin-top: 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Add some padding to Testimonial Section */
+.testimonial-section {
+  margin-top: 60px;
 }
