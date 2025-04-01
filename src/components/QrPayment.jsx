@@ -1,28 +1,22 @@
-import React, { useState } from "react";
-import QRCode from "qrcode.react";
+import React, { useRef } from "react";
+import ReactToPdf from "react-to-pdf";
 
-const QrPayment = () => {
-    const [amount, setAmount] = useState("");
-    const [qrValue, setQrValue] = useState("");
-
-    const generateQrCode = () => {
-        const qrData = `hedera:pay?recipient=${process.env.HEDERA_ACCOUNT_ID}&amount=${amount}`;
-        setQrValue(qrData);
-    };
+const Receipt = () => {
+    const pdfRef = useRef();
 
     return (
-        <div className="qr-payment">
-            <h2>Pay with QR Code</h2>
-            <input
-                type="number"
-                placeholder="Enter amount"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-            />
-            <button onClick={generateQrCode}>Generate QR</button>
-            {qrValue && <QRCode value={qrValue} size={150} />}
+        <div>
+            <h2>Transaction Receipt</h2>
+            <div ref={pdfRef} style={{ padding: 20, border: "1px solid black" }}>
+                <p>Transaction ID: 123456789</p>
+                <p>Amount: 50 HBAR</p>
+                <p>Status: Successful</p>
+            </div>
+            <ReactToPdf targetRef={pdfRef} filename="receipt.pdf">
+                {({ toPdf }) => <button onClick={toPdf}>Download Receipt</button>}
+            </ReactToPdf>
         </div>
     );
 };
 
-export default QrPayment;
+export default Receipt;

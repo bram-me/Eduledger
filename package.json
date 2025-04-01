@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hashgraph/sdk": "^2.61.0",
     "axios": "^1.8.4",
     "framer-motion": "^12.6.2",
     "qrcode.react": "^4.2.0",
