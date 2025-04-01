@@ -17,7 +17,7 @@ const PaymentHistory = () => {
 
         doc.setFont("helvetica", "bold");
         doc.setFontSize(18);
-        doc.text("ElimuLedger Payment Receipt", 20, 20);
+        doc.text("EduLedger Payment Receipt", 20, 20);
 
         doc.setFontSize(12);
         doc.text(`Student Name: ${payment.student_name}`, 20, 40);

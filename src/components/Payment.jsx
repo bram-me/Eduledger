@@ -4,6 +4,7 @@ import Receipt from "./Receipt";
 import QrPayment from "./QrPayment";
 import QrCodeScanner from "./QrCodeScanner";
 import ReceiptDownload from "./ReceiptDownload";
+import './Payment.css';
 
 const Payment = () => {
     const [studentId, setStudentId] = useState("");
@@ -18,7 +19,7 @@ const Payment = () => {
     };
 
     const handlePaymentProcess = async () => {
-        // Here you can initiate the payment process (this is an example)
+        
         const response = await fetch("/hedera-payment", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
