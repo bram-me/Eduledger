@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Outlet, Link } from "react-router-dom";
 import { FaUserGraduate, FaMoneyBill, FaDatabase, FaWallet, FaHistory, FaCog, FaCertificate, FaAngleDown, FaAngleUp } from "react-icons/fa";
 import "./Dashboard.css";
+import edulegderIcon from '../assets/edulegder-icon.svg';
 
 const Dashboard = () => {
   const [collapsed, setCollapsed] = useState({
@@ -39,10 +40,10 @@ const Dashboard = () => {
     <div className="flex">
       {/* Sidebar */}
       <div className="sidebar">
-        <div className="sidebar-header flex items-center mb-6">
-          <img src="./assets/edulegder-icon.svg" alt="EduLedger Icon" className="text-white text-3xl mr-2" />
-          <h2 className="text-white text-2xl font-bold">EduLedger</h2>
-        </div>
+      <div className="sidebar-header">
+  <img src={edulegderIcon} alt="EduLedger Icon" className="sidebar-icon" />
+  <h2 className="sidebar-title">EduLedger</h2>
+</div>
         <nav className="sidebar-nav">
           <Link to="/dashboard" className="sidebar-link">Home</Link>
           
