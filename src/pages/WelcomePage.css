@@ -1,78 +1,98 @@
+/* Welcomepage.css */
+
+/* General Styles */
+.hero {
+  background-color: #1a202c;
+  color: white;
+  padding: 60px 20px;
+  border-radius: 10px;
+}
+
+.get-started-btn {
+  background-color: #2b6cb0;
+  color: white;
+  padding: 10px 20px;
+  font-size: 18px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.get-started-btn:hover {
+  background-color: #3182ce;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.feature-box {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.feature-box h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.feature-box p {
+  color: #6b7280;
+}
+
+.feature-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Welcomepage.css */
+
 /* Hero Section */
 .hero {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #007bff, #0056b3); /* Matching blue shades */
-    color: white;
-    padding: 80px 40px;
-    border-radius: 20px;
-    margin: 20px;
-  }
-  
-  /* Button */
-  .hero-btn {
-    display: inline-block;
-    padding: 12px 24px;
-    font-size: 1.1rem;
-    background: #ffb300; /* Yellow-orange */
-    color: black;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  
-  .hero-btn:hover {
-    background: #ff9800; /* Slightly darker on hover */
-  }
-  
-  /* Feature Cards */
-  .feature-box {
-    flex: 1;
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out;
-  }
-  
-  .feature-box:hover {
-    transform: translateY(-10px);
-  }
-  
-  .feature-box h3 {
-    margin-top: 10px;
-    font-size: 1.5rem;
-  }
-  
-  .feature-box p {
-    font-size: 1rem;
-    color: #555;
-  }
-  
-  /* Button Style */
+  padding: 40px 0;
+  background: linear-gradient(to bottom, #2d91b9, #61c1a2);
+  color: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Feature Card Styling */
+.feature-box {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.feature-box:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
 .get-started-btn {
-    display: inline-block;
-    padding: 12px 24px;
-    font-size: 1.2rem;
-    background: #ffb300;
-    color: black;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    text-align: center;
-    transition: background 0.3s ease, transform 0.2s ease;
-    font-weight: bold;
+  padding: 12px 24px;
+  background-color: #2d91b9;
+  color: white;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
+}
+
+.get-started-btn:hover {
+  background-color: #1c6b81;
+  cursor: pointer;
+}
+
+
+/* Responsive Design for Mobile */
+@media (max-width: 768px) {
+  .features {
+    grid-template-columns: 1fr;
   }
-  
-  .get-started-btn:hover {
-    background: #ff9800;
-    transform: translateY(-5px);
-  }
-  
-  .get-started-btn:focus {
-    outline: none;
-  }
-  
+}

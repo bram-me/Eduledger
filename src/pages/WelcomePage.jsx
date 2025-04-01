@@ -2,9 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "../App.css";  // Import for global styles (app.css)
 import "./Welcomepage.css";  // Import for specific styles (welcomepage.css)
-import { Button } from "../components/ui/button";
 import { motion } from "framer-motion";
-import { FaGraduationCap, FaLock, FaChartBar } from "react-icons/fa";
+import { FaGraduationCap, FaLock, FaChartBar, FaRegCheckCircle, FaCertificate, FaWallet, FaHistory, FaCog } from "react-icons/fa";
 
 const WelcomePage = () => {
   return (
@@ -40,9 +39,39 @@ const WelcomePage = () => {
           description="Instant, low-cost payments using Hedera Token Service (HTS)."
         />
         <FeatureCard
-          icon={<FaChartBar size={40} className="text-purple-500" />}
+          icon={<FaRegCheckCircle size={40} className="text-red-500" />}
+          title="Voting System"
+          description="Decentralized and secure voting for school elections."
+        />
+        <FeatureCard
+          icon={<FaCertificate size={40} className="text-yellow-500" />}
+          title="NFT Achievements"
+          description="NFT-based achievements and rewards for students."
+        />
+        <FeatureCard
+          icon={<FaCertificate size={40} className="text-purple-500" />}
+          title="Certification Manager"
+          description="Manage and issue blockchain-certified student records."
+        />
+        <FeatureCard
+          icon={<FaWallet size={40} className="text-indigo-500" />}
+          title="Wallet Management"
+          description="Manage digital wallets for fee payments and rewards."
+        />
+        <FeatureCard
+          icon={<FaHistory size={40} className="text-teal-500" />}
+          title="Transaction History"
+          description="Track and view all fee transactions and history."
+        />
+        <FeatureCard
+          icon={<FaChartBar size={40} className="text-orange-500" />}
           title="Advanced Analytics"
           description="Track school performance and student progress effortlessly."
+        />
+        <FeatureCard
+          icon={<FaCog size={40} className="text-gray-500" />}
+          title="Settings"
+          description="Manage system preferences, user roles, and more."
         />
       </div>
     </div>
