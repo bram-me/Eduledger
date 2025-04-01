@@ -7,15 +7,21 @@
 }
 
 body {
-  background: #f4f7fc;
+  background: linear-gradient(135deg, #e0f7fa, #f1f8e9);
   color: #333;
   line-height: 1.6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  flex-direction: column;
 }
 
 .container {
   max-width: 1200px;
   margin: auto;
   padding: 20px;
+  width: 100%;
 }
 
 /* Hero Section */
@@ -23,25 +29,32 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(135deg, #2196F3, #1E88E5);
+  background: linear-gradient(135deg, #007bff, #00c6ff);
   color: white;
-  padding: 80px 40px;
+  padding: 60px 40px;
   border-radius: 20px;
   margin: 20px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  flex-wrap: wrap;
+  width: 100%;
 }
 
 .hero-content {
   flex: 1;
+  text-align: center;
+  min-width: 280px;
 }
 
 .hero h1 {
   font-size: 3rem;
   font-weight: bold;
+  text-transform: uppercase;
 }
 
 .hero p {
   font-size: 1.2rem;
   margin: 20px 0;
+  opacity: 0.9;
 }
 
 .hero-btn {
@@ -51,13 +64,15 @@ body {
   background: #ffb300;
   color: black;
   border: none;
-  border-radius: 8px;
+  border-radius: 50px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0px 5px 15px rgba(255, 179, 0, 0.4);
 }
 
 .hero-btn:hover {
   background: #ff9800;
+  transform: translateY(-3px);
 }
 
 /* Feature Section */
@@ -66,25 +81,30 @@ body {
   justify-content: space-between;
   gap: 20px;
   padding: 50px 20px;
+  flex-wrap: wrap;
+  width: 100%;
 }
 
 .feature-box {
   flex: 1;
   background: white;
   padding: 30px;
-  border-radius: 10px;
+  border-radius: 15px;
   text-align: center;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease-in-out;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  min-width: 280px;
 }
 
 .feature-box:hover {
   transform: translateY(-10px);
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 .feature-box h3 {
   margin-top: 10px;
   font-size: 1.5rem;
+  color: #007bff;
 }
 
 .feature-box p {
@@ -93,242 +113,85 @@ body {
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .hero {
     flex-direction: column;
     text-align: center;
+    padding: 40px 20px;
   }
-  
+}
+
+@media (max-width: 768px) {
   .features {
     flex-direction: column;
   }
 }
 
-.payment-status {
-  text-align: center;
-  padding: 20px;
-  background: #f8f9fa;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  font-size: 18px;
+@media (max-width: 480px) {
+  .hero h1 {
+    font-size: 2rem;
+  }
+  .hero p {
+    font-size: 1rem;
+  }
+  .feature-box {
+    padding: 20px;
+  }
 }
 
-.payment-status p {
-  font-weight: bold;
-  color: #333;
-}
-
-
-
-.settings-container {
-  width: 50%;
-  margin: auto;
-  padding: 20px;
-  background: white;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-}
-
-.settings-section {
-  margin-bottom: 15px;
-}
-
-label {
-  display: block;
-  font-weight: bold;
-}
-
-input, select {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-button {
-  padding: 10px;
-  width: 100%;
-  background: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #45a049;
-}
-.wallet-container {
-  width: 90%;
-  max-width: 600px;
-  margin: auto;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 10px;
-  text-align: center;
-}
-
-.wallet-balance {
-  font-size: 1.2rem;
-  margin-bottom: 20px;
-}
-
-.wallet-balance button {
-  background: #007bff;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  cursor: pointer;
-}
-
-.transaction-history ul {
-  list-style: none;
-  padding: 0;
-}
-
-.transaction-history li {
-  padding: 8px;
-  border-bottom: 1px solid #ddd;
-}
-
-.transaction-history .completed {
-  color: green;
-}
-
-.transaction-history .pending {
-  color: orange;
-}
-
-/* Wallet Dashboard Styles */
-.wallet-dashboard {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: linear-gradient(145deg, #1a1a2e, #16213e);
-  color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-  text-align: center;
-}
-
-.wallet-dashboard h2 {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-}
-
-.wallet-balance {
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #29c7ac;
-  margin-bottom: 1rem;
-}
-
-.transaction-history {
-  margin-top: 2rem;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 1.5rem;
-  border-radius: 8px;
-}
-
-.transaction-history h2 {
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
-  color: #ffcc00;
-}
-
-.transaction-history ul {
-  list-style: none;
-  padding: 0;
-}
-
-.transaction-history li {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 0.8rem;
-  margin: 0.5rem 0;
-  border-radius: 5px;
-  font-size: 1.1rem;
-}
-
-.qr-payment {
-  margin-top: 2rem;
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  text-align: center;
-}
-
-.qr-payment input {
-  width: 80%;
-  padding: 0.8rem;
-  font-size: 1rem;
-  border-radius: 5px;
-  border: none;
-  margin-bottom: 1rem;
-}
-
-.qr-payment button {
-  padding: 0.8rem 1.5rem;
-  background: #ffcc00;
-  color: black;
-  font-weight: bold;
-  font-size: 1.1rem;
-  border: none;
-  cursor: pointer;
-  transition: 0.3s ease;
-}
-
-.qr-payment button:hover {
-  background: #ffaa00;
-}
-
-.qr-payment canvas {
-  margin-top: 1rem;
-  border: 5px solid white;
-  padding: 1rem;
-  background: white;
-}
-
+/* Payment Page */
 .payment-page {
   text-align: center;
-  padding: 20px;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 15px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
+  max-width: 600px;
+  margin: auto;
 }
 
 .qr-section {
   display: flex;
   justify-content: center;
   gap: 20px;
+  margin: 20px 0;
 }
 
 .pay-btn {
   background: #28a745;
   color: white;
-  padding: 10px 15px;
+  padding: 12px 18px;
   border: none;
+  border-radius: 50px;
   cursor: pointer;
-  border-radius: 5px;
+  transition: all 0.3s ease;
+  box-shadow: 0px 5px 10px rgba(40, 167, 69, 0.3);
 }
 
 .pay-btn:hover {
   background: #218838;
+  transform: scale(1.05);
 }
 
+/* Receipt Section */
 .receipt-container {
   text-align: center;
   padding: 20px;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  width: 100%;
+  max-width: 600px;
 }
 
 .receipt {
   padding: 15px;
-  border: 1px solid #ccc;
   background: #f8f9fa;
   width: 80%;
   margin: 0 auto;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
 }
 
 .download-btn {
@@ -338,85 +201,18 @@ button:hover {
   padding: 10px 15px;
   border: none;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
 .download-btn:hover {
   background: #0056b3;
+  transform: scale(1.05);
 }
 
-.receipt-download {
-  text-align: center;
-  max-width: 400px;
-  margin: 50px auto;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.receipt-download input {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.receipt-download button {
-  background-color: #007bff;
-  color: white;
-  padding: 10px;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-  width: 100%;
-}
-
-.receipt-download button:disabled {
-  background-color: #ccc;
-}
-
+/* Error Message */
 .error {
   color: red;
   margin-top: 10px;
-}
-.settings-container {
-  width: 50%;
-  margin: auto;
-  padding: 20px;
-  background: white;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-}
-
-.settings-section {
-  margin-bottom: 15px;
-}
-
-label {
-  display: block;
   font-weight: bold;
-}
-
-input, select {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-button {
-  padding: 10px;
-  width: 100%;
-  background: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #45a049;
 }

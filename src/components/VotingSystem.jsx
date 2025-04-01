@@ -10,6 +10,7 @@ const VotingSystem = () => {
   const [selectedVote, setSelectedVote] = useState({ position: "", student: "" });  // To store the selected vote
   const [loading, setLoading] = useState(false); // For loading state while voting
   const [votingStatus, setVotingStatus] = useState("");  // For displaying voting status
+  const [votesCount, setVotesCount] = useState({});  // Track the number of votes per candidate
 
   const accountId = process.env.HEDERA_ACCOUNT_ID;
   const privateKey = process.env.HEDERA_PRIVATE_KEY;
@@ -33,6 +34,16 @@ const VotingSystem = () => {
 
       const receipt = await transaction.getReceipt(client);
       setVotingStatus(`Vote cast successfully! Status: ${receipt.status.toString()}`);
+
+      // Update votes count after a successful vote
+      setVotesCount((prevVotes) => ({
+        ...prevVotes,
+        [selectedVote.position]: {
+          ...prevVotes[selectedVote.position],
+          [selectedVote.student]: (prevVotes[selectedVote.position]?.[selectedVote.student] || 0) + 1,
+        }
+      }));
+
       setSelectedVote({ position: "", student: "" }); // Reset after voting
       setPosition(""); // Reset position
       setStudent(""); // Reset student
@@ -63,6 +74,16 @@ const VotingSystem = () => {
 
   const handleCancelVote = () => {
     setShowConfirmation(false); // Close the confirmation modal
+  };
+
+  const resetVotes = () => {
+    setVotesCount({});
+    alert("Votes have been reset!");
+  };
+
+  const addCandidate = (position, newCandidate) => {
+    positions[position].push(newCandidate);
+    alert(`New candidate ${newCandidate} added to ${position}`);
   };
 
   return (
@@ -100,6 +121,16 @@ const VotingSystem = () => {
         </div>
       )}
 
+      {/* Admin Features */}
+      <div className="admin-features">
+        <button className="reset-votes-btn" onClick={resetVotes}>
+          Reset All Votes
+        </button>
+        <button className="add-candidate-btn" onClick={() => addCandidate(position, prompt("Enter new candidate name"))}>
+          Add New Candidate
+        </button>
+      </div>
+
       {/* Confirmation Modal */}
       {showConfirmation && (
         <div className="confirmation-modal">
@@ -122,6 +153,19 @@ const VotingSystem = () => {
 
       {/* Display voting status */}
       {votingStatus && <p>{votingStatus}</p>}
+
+      {/* Display Vote Count */}
+      <div className="vote-counts">
+        <h3>Vote Counts</h3>
+        {Object.keys(votesCount).map((pos) => (
+          <div key={pos}>
+            <h4>{pos}</h4>
+            {Object.entries(votesCount[pos]).map(([candidate, count]) => (
+              <p key={candidate}>{candidate}: {count} vote(s)</p>
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

@@ -1,15 +1,34 @@
-require('dotenv').config();
+const dotenv = require("dotenv");
+dotenv.config();
+
+console.log("🔹 HEDERA_PRIVATE_KEY:", process.env.HEDERA_PRIVATE_KEY);
+const { PrivateKey, Client, AccountCreateTransaction, 
+    AccountBalanceQuery, TransferTransaction, Hbar, FileCreateTransaction 
+} = require('@hashgraph/sdk');
+
+const hederaPrivateKey = process.env.HEDERA_PRIVATE_KEY?.trim();
+
+if (!hederaPrivateKey) {
+    console.error("❌ HEDERA_PRIVATE_KEY is missing or invalid!");
+    process.exit(1);
+}
+
+console.log("✅ Using HEDERA_PRIVATE_KEY:", hederaPrivateKey);
+
+try {
+    const privateKey = PrivateKey.fromString(hederaPrivateKey);
+    console.log("✅ Private Key loaded successfully!");
+} catch (error) {
+    console.error("❌ Error parsing Private Key:", error.message);
+    process.exit(1);
+}
+
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const sqlite3 = require('sqlite3').verbose();
-const { 
-    Client, PrivateKey, AccountCreateTransaction, 
-    AccountBalanceQuery, TransferTransaction, Hbar,
-    FileCreateTransaction 
-} = require('@hashgraph/sdk');
 const pdf = require('pdfkit');
 const fs = require('fs');
 const WebSocket = require("ws");
@@ -232,7 +251,6 @@ app.post("/upload-receipt", async (req, res) => {
     }
 });
 
-
 /**
  * Fetch Account Balance
  */
@@ -291,6 +309,7 @@ app.get('/download-receipt/:transactionId', async (req, res) => {
         const qrData = `https://elimuledger.com/verify/${transactionId}`;
         const qrCode = await QRCode.toDataURL(qrData);
 
+        
         // Create PDF
         const pdfDoc = await PDFDocument.create();
         const page = pdfDoc.addPage([500, 700]);
@@ -361,7 +380,6 @@ app.get('/api/verify/:transactionId', (req, res) => {
 
 const { FileContentsQuery } = require("@hashgraph/sdk");
 const path = require("path");
-const fs = require("fs");
 
 // Retrieve File from Hedera HFS
 async function fetchFromHedera(fileId) {

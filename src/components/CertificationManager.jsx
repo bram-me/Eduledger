@@ -1,167 +1,174 @@
 import React, { useState, useEffect } from "react";
-import { Client, TransferTransaction, Hbar } from "@hashgraph/sdk";
-import { FaSearch } from "react-icons/fa";
-import { saveAs } from "file-saver"; // To save CSV file
+import {
+  Client,
+  FileCreateTransaction,
+  FileContentsQuery,
+  TokenCreateTransaction,
+  TokenMintTransaction,
+  TokenNftInfoQuery,
+  TokenAssociateTransaction,
+  PrivateKey,
+  TokenId,
+} from "@hashgraph/sdk";
+import QRCode from "react-qr-code";
 import "./CertificationManager.css";
 
 const CertificationManager = () => {
   const [certificates, setCertificates] = useState([]);
+  const [formData, setFormData] = useState({ studentId: "", course: "", date: "", status: "Issued" });
+  const [preview, setPreview] = useState(null);
+  const [nftCollectionId, setNftCollectionId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [page, setPage] = useState(1);
-  const [selectedCertificate, setSelectedCertificate] = useState(null); // For modal
-  const certificatesPerPage = 5;
 
-  const accountId = process.env.HEDERA_ACCOUNT_ID;
-  const privateKey = process.env.HEDERA_PRIVATE_KEY;
+  const accountId = import.meta.env.VITE_HEDERA_ACCOUNT_ID;
+  const privateKey = PrivateKey.fromString(import.meta.env.VITE_HEDERA_PRIVATE_KEY);
+  const client = Client.forTestnet().setOperator(accountId, privateKey);
 
   useEffect(() => {
-    // Fetch certificates (mocked data for now)
-    setCertificates([
-      { studentId: 1, course: "Math 101", date: "2025-04-01", status: "Issued" },
-      { studentId: 2, course: "Science 101", date: "2025-04-01", status: "Issued" },
-      // Add more mocked data for testing...
-    ]);
+    fetchIssuedCertificates();
   }, []);
 
-  const issueCertificate = async (studentId, certificateData) => {
-    setLoading(true);
-    const client = Client.forTestnet().setOperator(accountId, privateKey);
+  const handleInputChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
+  const generatePreview = () => {
+    setPreview({ ...formData, issuedBy: "My Institute" });
+  };
+
+  const createNftCollection = async () => {
+    setLoading(true);
     try {
-      const transaction = await new TransferTransaction()
-        .addHbarTransfer(accountId, new Hbar(-1)) // Deducting fee for issuing certificate
-        .addHbarTransfer("0.0.123456", new Hbar(1)) // Sending fee or value for the certificate issuance
+      const tx = await new TokenCreateTransaction()
+        .setTokenName("CertificateNFT")
+        .setTokenSymbol("CERT")
+        .setTreasuryAccountId(accountId)
+        .setAdminKey(privateKey)
+        .setSupplyKey(privateKey)
+        .setTokenType(1)
+        .setInitialSupply(0)
         .execute(client);
 
-      const receipt = await transaction.getReceipt(client);
-      alert("Certificate Issued! Status: " + receipt.status.toString());
-
-      setCertificates([...certificates, certificateData]);
+      const receipt = await tx.getReceipt(client);
+      setNftCollectionId(receipt.tokenId.toString());
+      alert(`NFT Collection Created: ${receipt.tokenId}`);
     } catch (error) {
-      console.error("Error issuing certificate:", error);
+      console.error("NFT Collection Error:", error);
     }
     setLoading(false);
   };
 
-  const handleSearchChange = (e) => setSearchQuery(e.target.value);
-
-  const filteredCertificates = certificates.filter((cert) =>
-    cert.course.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(filteredCertificates.length / certificatesPerPage);
-  const currentCertificates = filteredCertificates.slice(
-    (page - 1) * certificatesPerPage,
-    page * certificatesPerPage
-  );
-
-  // Function to export certificates to CSV
-  const exportCertificatesToCSV = () => {
-    const csvData = [
-      ["Student ID", "Course", "Issue Date", "Status"], // CSV Header
-      ...certificates.map(cert => [
-        cert.studentId,
-        cert.course,
-        cert.date,
-        cert.status,
-      ]),
-    ];
-
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvData.forEach((rowArray) => {
-      const row = rowArray.join(",");
-      csvContent += row + "\r\n";
-    });
-
-    const encodedUri = encodeURI(csvContent);
-    saveAs(encodedUri, "certificates.csv"); // Save as CSV
+  const storeCertificateFile = async (certificateData) => {
+    const fileContent = JSON.stringify(certificateData);
+    const tx = await new FileCreateTransaction()
+      .setContents(fileContent)
+      .execute(client);
+    const receipt = await tx.getReceipt(client);
+    return receipt.fileId.toString();
   };
 
-  // Function to handle certificate click and show details
-  const handleCertificateClick = (cert) => {
-    setSelectedCertificate(cert);
+  const issueCertificateNFT = async () => {
+    setLoading(true);
+    try {
+      if (!nftCollectionId) return alert("Create NFT collection first!");
+
+      const fileId = await storeCertificateFile(preview);
+      const metadata = JSON.stringify({ fileId });
+
+      await new TokenAssociateTransaction()
+        .setAccountId(accountId)
+        .setTokenIds([nftCollectionId])
+        .execute(client);
+
+      const mintTx = await new TokenMintTransaction()
+        .setTokenId(nftCollectionId)
+        .setMetadata([Buffer.from(metadata)])
+        .execute(client);
+
+      const receipt = await mintTx.getReceipt(client);
+      setCertificates([...certificates, { ...preview, nftId: receipt.tokenId.toString(), fileId }]);
+      alert("Certificate Issued as NFT!");
+    } catch (error) {
+      console.error("Issue NFT Error:", error);
+    }
+    setLoading(false);
+  };
+
+  const fetchIssuedCertificates = async () => {
+    try {
+      if (!nftCollectionId) return;
+      const tokenId = TokenId.fromString(nftCollectionId);
+
+      for (let i = 1; i <= 10; i++) {
+        try {
+          const nftInfo = await new TokenNftInfoQuery()
+            .setTokenId(tokenId)
+            .setSerialNumber(i)
+            .execute(client);
+
+          const metadata = JSON.parse(nftInfo.metadata.toString());
+          const fileId = metadata.fileId;
+
+          const fileQuery = await new FileContentsQuery().setFileId(fileId).execute(client);
+          const certificateData = JSON.parse(fileQuery.toString());
+
+          setCertificates((prev) => [...prev, { ...certificateData, nftId: tokenId.toString(), fileId }]);
+        } catch (err) {
+          console.log("No more NFTs found.");
+          break;
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching certificates:", error);
+    }
   };
 
   return (
     <div className="certification-manager">
-      <h2 className="title">Certification Management</h2>
-      <div className="search-container">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          placeholder="Search Certificates"
-          className="search-input"
-        />
-        <FaSearch className="search-icon" />
+      <h2>Certification Management</h2>
+
+      <div className="form-container">
+        <input type="text" name="studentId" placeholder="Student ID" onChange={handleInputChange} />
+        <input type="text" name="course" placeholder="Course Name" onChange={handleInputChange} />
+        <input type="date" name="date" onChange={handleInputChange} />
+        <button onClick={generatePreview}>Preview Certificate</button>
       </div>
 
-      <button
-        onClick={() => issueCertificate(1, { studentId: 1, course: "Math 101", date: "2025-04-01", status: "Pending" })}
-        className="issue-button"
-        disabled={loading}
-      >
-        {loading ? "Issuing..." : "Issue Certificate"}
-      </button>
-
-      {/* Export to CSV Button */}
-      <button onClick={exportCertificatesToCSV} className="export-button">
-        Export Certificates to CSV
-      </button>
-
-      <div className="certificate-list">
-        {loading ? (
-          <div className="loading">Issuing certificate... Please wait.</div>
-        ) : (
-          <>
-            <ul>
-              {currentCertificates.map((cert, index) => (
-                <li key={index} className="certificate-item" onClick={() => handleCertificateClick(cert)}>
-                  <span className="certificate-id">Student ID: {cert.studentId}</span>
-                  <span className="certificate-course">Course: {cert.course}</span>
-                  <span className="certificate-date">Issued on: {cert.date}</span>
-                  <span className={`certificate-status ${cert.status.toLowerCase()}`}>
-                    {cert.status}
-                  </span>
-                </li>
-              ))}
-            </ul>
-
-            {/* Pagination */}
-            <div className="pagination">
-              <button onClick={() => setPage(page - 1)} disabled={page <= 1}>
-                Previous
-              </button>
-              <span>
-                Page {page} of {totalPages}
-              </span>
-              <button onClick={() => setPage(page + 1)} disabled={page >= totalPages}>
-                Next
-              </button>
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Certificate Detail Modal */}
-      {selectedCertificate && (
-        <div className="certificate-modal">
-          <div className="modal-content">
-            <h3>Certificate Details</h3>
-            <p><strong>Student ID:</strong> {selectedCertificate.studentId}</p>
-            <p><strong>Course:</strong> {selectedCertificate.course}</p>
-            <p><strong>Issued on:</strong> {selectedCertificate.date}</p>
-            <p><strong>Status:</strong> {selectedCertificate.status}</p>
-            <button onClick={() => setSelectedCertificate(null)} className="close-modal-button">
-              Close
-            </button>
-          </div>
+      {preview && (
+        <div className="preview-card">
+          <h3>Certificate Preview</h3>
+          <p>Student ID: {preview.studentId}</p>
+          <p>Course: {preview.course}</p>
+          <p>Date: {preview.date}</p>
+          <p>Status: {preview.status}</p>
+          <p>Issued By: {preview.issuedBy}</p>
         </div>
       )}
+
+      <div className="action-buttons">
+        <button onClick={createNftCollection} disabled={loading}>
+          {loading ? "Creating NFT Collection..." : "Create NFT Collection"}
+        </button>
+        <button onClick={issueCertificateNFT} disabled={loading || !preview}>
+          {loading ? "Issuing Certificate..." : "Issue Certificate as NFT"}
+        </button>
+        <button onClick={fetchIssuedCertificates}>Fetch Issued Certificates</button>
+      </div>
+
+      <h3>Issued Certificates</h3>
+      <ul className="certificate-list">
+        {certificates.map((cert, index) => (
+          <li key={index} className="certificate-item">
+            <p><strong>Student ID:</strong> {cert.studentId}</p>
+            <p><strong>Course:</strong> {cert.course}</p>
+            <p><strong>NFT ID:</strong> {cert.nftId}</p>
+            <p><strong>File ID:</strong> {cert.fileId}</p>
+            <div className="qr-code">
+              <QRCode value={`https://hashscan.io/testnet/token/${cert.nftId}`} />
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
 
 export default CertificationManager;
-
