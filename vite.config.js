@@ -1,19 +1,21 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
+      '@': '/src',  // Vite prefers this way instead of path.resolve
     },
   },
+  build: {
+    outDir: 'dist', // Ensure Vercel looks in the correct build folder
+  },
   define: {
-    global: 'window',  // Ensure global is window
-    'process.env': {}  // Fix issues related to Node.js global process object
+    global: 'window',
+    'process.env': {},
   },
   optimizeDeps: {
-    include: ['buffer'],  // Explicitly optimize the buffer package
+    include: ['buffer'],
   },
 });

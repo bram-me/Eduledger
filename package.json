@@ -15,12 +15,11 @@
     "buffer": "^6.0.3",
     "file-saver": "^2.0.5",
     "framer-motion": "^12.6.2",
+    "html5-qrcode": "^2.3.8",
     "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
-    "react-qr-reader": "^3.0.0-beta-1",
-    "react-qr-scanner": "^1.0.0-alpha.11",
     "react-router-dom": "^7.4.1",
     "react-to-pdf": "^2.0.0"
   },
