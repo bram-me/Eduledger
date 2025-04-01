@@ -1,6 +1,11 @@
-const Button = ({ children, ...props }) => {
-    return <button {...props}>{children}</button>;
-  };
-  
-  export default Button;
-  
+import React from 'react';
+
+// Ensure Button is exported by name
+export function Button({ children, onClick }) {
+  return (
+    <button onClick={onClick} className="button">
+      {children}
+    </button>
+  );
+}
+

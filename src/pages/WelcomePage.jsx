@@ -1,4 +1,6 @@
 import React from "react";
+import "../App.css";  // Import for global styles (app.css)
+import "./Welcomepage.css";  // Import for specific styles (welcomepage.css)
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";

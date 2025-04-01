@@ -18,7 +18,8 @@ import TransactionHistory from "./components/TransactionHistory";
 import VerifyTransaction from "./components/VerifyTransaction";
 import Wallet from "./components/Wallet";
 
-import "./App.css";
+// Import styles
+import "./App.css"; // Global styles
 
 function App() {
   return (
