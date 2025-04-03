@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from 'react-router-dom';
 import { FaTwitter, FaGithub, FaLinkedin } from "react-icons/fa";
 import { FaChartLine, FaLock, FaTrophy, FaUsers, FaBook, FaWallet, FaHistory, FaCog, FaGraduationCap } from "react-icons/fa"; // Importing icons
 import "./WelcomePage.css"; // Import the external CSS
@@ -92,9 +93,9 @@ const WelcomePage = () => {
       Secure, transparent, and scalable.
     </p>
     <div className="cta-buttons">
-      <a href="/dashboard" className="cta-btn primary">
-        Get Started
-      </a>
+        <Link to="/dashboard" className="cta-btn primary">
+         Get Started
+        </Link>
       <a href="#stats" className="cta-btn secondary">
         Learn More
       </a>
