@@ -1,159 +1,234 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import "../App.css";  // Import for global styles (app.css)
-import "./WelcomePage.css";  // Import for specific styles (welcomepage.css)
-import { motion } from "framer-motion";
-import { FaGraduationCap, FaLock, FaChartBar, FaRegCheckCircle, FaCertificate, FaWallet, FaHistory, FaCog } from "react-icons/fa";
-import edulegderIcon from '../assets/edulegder-icon.svg';
-
-// Testimonial data (can be replaced with real testimonials later)
-const testimonials = [
-  {
-    name: "John Doe",
-    role: "Student",
-    feedback: "EduLedger transformed my school experience! Secure, fast, and transparent records management."
-  },
-  {
-    name: "Jane Smith",
-    role: "Teacher",
-    feedback: "A game changer for fee payments and student performance tracking. Very user-friendly!"
-  },
-  {
-    name: "Mark Brown",
-    role: "Administrator",
-    feedback: "Efficient, decentralized, and secure. EduLedger is the future of school management."
-  }
-];
+import { FaTwitter, FaGithub, FaLinkedin } from "react-icons/fa";
+import { FaChartLine, FaLock, FaTrophy, FaUsers, FaBook, FaWallet, FaHistory, FaCog, FaGraduationCap } from "react-icons/fa"; // Importing icons
+import "./WelcomePage.css"; // Import the external CSS
+import decentralizedRecords from "../assets/decentralized-records.jpg";
+import secureFeePayments from "../assets/secure-fee-payments.jpg";
+import votingSystem from "../assets/voting-system.jpg";
+import nftAchievements from "../assets/nft-achievements.jpg";
+import certificationManager from "../assets/certification-manager.jpg";
+import walletManagement from "../assets/wallet-management.jpg";
+import transactionHistory from "../assets/transaction-history.jpg";
+import advancedAnalytics from "../assets/advanced-analytics.png";
+import settings from "../assets/settings.jpg";
 
 const WelcomePage = () => {
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [flippedCard, setFlippedCard] = useState(null);
 
-  // Cycle through testimonials every 4 seconds
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 4000);
-    return () => clearInterval(interval); // Cleanup on component unmount
-  }, []);
+  const handleCardClick = (index) => {
+    setFlippedCard(index === flippedCard ? null : index);
+  };
+
+  const getFeatureTitle = (index) => {
+    switch (index) {
+      case 0: return "Decentralized Records";
+      case 1: return "Secure Fee Payments";
+      case 2: return "Voting System";
+      case 3: return "NFT Achievements";
+      case 4: return "Certification Manager";
+      case 5: return "Wallet Management";
+      case 6: return "Transaction History";
+      case 7: return "Advanced Analytics";
+      case 8: return "Settings";
+      default: return "";
+    }
+  };
+
+  const getFeatureDescription = (index) => {
+    switch (index) {
+      case 0: return "Secure and transparent academic records stored on Hedera.";
+      case 1: return "Instant, low-cost payments using Hedera Token Service (HTS).";
+      case 2: return "Decentralized and secure voting for school elections.";
+      case 3: return "NFT-based achievements and rewards for students.";
+      case 4: return "Manage and issue blockchain-certified student records.";
+      case 5: return "Manage digital wallets for fee payments and rewards.";
+      case 6: return "Track and view all fee transactions and history.";
+      case 7: return "Track school performance and student progress effortlessly.";
+      case 8: return "Manage system preferences, user roles, and more.";
+      default: return "";
+    }
+  };
+
+  const getFeatureImage = (index) => {
+    switch (index) {
+      case 0: return decentralizedRecords;
+      case 1: return secureFeePayments;
+      case 2: return votingSystem;
+      case 3: return nftAchievements;
+      case 4: return certificationManager;
+      case 5: return walletManagement;
+      case 6: return transactionHistory;
+      case 7: return advancedAnalytics;
+      case 8: return settings;
+      default: return "";
+    }
+  };
+
+  const getFeatureIcon = (index) => {
+    switch (index) {
+      case 0: return <FaGraduationCap />;
+      case 1: return <FaWallet />;
+      case 2: return <FaUsers />;
+      case 3: return <FaTrophy />;
+      case 4: return <FaBook />;
+      case 5: return <FaLock />;
+      case 6: return <FaHistory />;
+      case 7: return <FaChartLine />;
+      case 8: return <FaCog />;
+      default: return null;
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-[#2D91B9] to-[#61C1A2] text-white relative">
-      {/* Hero Section */}
-      <motion.div
-        initial={{ opacity: 0, y: -100 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
-        className="hero text-center p-10 md:p-20 relative z-10"
-      >
-        {/* Background Animation */}
-        <div className="absolute inset-0 bg-cover bg-center opacity-40" style={{ backgroundImage: 'url(/assets/hero-bg.jpg)' }}></div>
+    <div className="welcome-page">
+      <section className="hero-section">
+  <div className="hero-overlay"></div>
+  <div className="hero-content">
+    <h1 className="hero-title">
+       <span className="highlight">EduLedger</span>
+    </h1>
+    <p className="hero-subtitle">
+      Revolutionizing education with Hedera's blockchain technology.
+      Secure, transparent, and scalable.
+    </p>
+    <div className="cta-buttons">
+      <a href="/dashboard" className="cta-btn primary">
+        Get Started
+      </a>
+      <a href="#stats" className="cta-btn secondary">
+        Learn More
+      </a>
+    </div>
+  </div>
+  {/* Social Media Icons */}
+  <div className="social-icons">
+    <a href="https://x.com/ElimuLedger" target="_blank" rel="noreferrer">
+      <FaTwitter />
+    </a>
+    <a href="https://substack.com/@eduledger" target="_blank" rel="noreferrer">
+      <FaGithub />
+    </a>
+    <a href="https://www.linkedin.com/in/bramwel-vasaka" target="_blank" rel="noreferrer">
+      <FaLinkedin />
+    </a>
+  </div>
+</section>
 
-        {/* EduLedger Logo */}
-        <div className="logo-container mb-6">
-          <img src={edulegderIcon} alt="EduLedger Logo" className="eduledger-logo mx-auto w-24 md:w-32" />
+
+{/* Stats Section */}
+<section id="stats" className="stats-section">
+  <div className="container">
+    {/* Title */}
+    <h2 className="section-title">Features</h2>
+    <div className="card-container">
+      {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
+        <div
+          key={index}
+          className={`card ${flippedCard === index ? "flipped" : ""}`}
+          onClick={() => handleCardClick(index)}
+        >
+          <div className="front">
+            <div className="icon-container">
+              {getFeatureIcon(index)} {/* Icon */}
+            </div>
+            <h3>{getFeatureTitle(index)}</h3>
+            <p>{getFeatureDescription(index)}</p>
+          </div>
+          <div className="back">
+            <img src={getFeatureImage(index)} alt="Feature" />
+          </div>
         </div>
+      ))}
+    </div>
+  </div>
+</section>
 
-        <h1 className="text-5xl sm:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-[#2D91B9] to-[#61C1A2]">
-          EduLedger
-        </h1>
-        <p className="text-lg sm:text-xl mt-4 text-gray-100 max-w-3xl mx-auto">
-          A next-generation blockchain-powered school management system that empowers educational institutions with secure, decentralized, and efficient record-keeping, payments, and more.
-        </p>
-        <Link to="/dashboard">
-          <button className="get-started-btn mt-8 py-3 px-8 bg-[#2D91B9] hover:bg-[#1C6B81] text-white font-semibold rounded-lg shadow-lg transition-all duration-300">
-            Get Started
-          </button>
-        </Link>
-      </motion.div>
+{/* YouTube Video Section */}
+<section className="video-section" id="video">
+  <div className="container">
+    <h2 className="section-title">Watch Our Demo</h2>
+    <iframe
+      width="100%"
+      height="500"
+      src="https://www.youtube.com/embed/C-VKuz82g-c"
+      title="EduLedger Demo"
+      frameBorder="0"
+      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+      allowFullScreen
+    ></iframe>
+  </div>
+</section>
 
-      {/* Features Section */}
-      <div className="features grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-6xl mx-auto mt-16 mb-16">
-        <FeatureCard
-          icon={<FaGraduationCap size={40} className="text-blue-500" />}
-          title="Decentralized Records"
-          description="Secure and transparent academic records stored on Hedera."
-        />
-        <FeatureCard
-          icon={<FaLock size={40} className="text-green-500" />}
-          title="Secure Fee Payments"
-          description="Instant, low-cost payments using Hedera Token Service (HTS)."
-        />
-        <FeatureCard
-          icon={<FaRegCheckCircle size={40} className="text-red-500" />}
-          title="Voting System"
-          description="Decentralized and secure voting for school elections."
-        />
-        <FeatureCard
-          icon={<FaCertificate size={40} className="text-yellow-500" />}
-          title="NFT Achievements"
-          description="NFT-based achievements and rewards for students."
-        />
-        <FeatureCard
-          icon={<FaCertificate size={40} className="text-purple-500" />}
-          title="Certification Manager"
-          description="Manage and issue blockchain-certified student records."
-        />
-        <FeatureCard
-          icon={<FaWallet size={40} className="text-indigo-500" />}
-          title="Wallet Management"
-          description="Manage digital wallets for fee payments and rewards."
-        />
-        <FeatureCard
-          icon={<FaHistory size={40} className="text-teal-500" />}
-          title="Transaction History"
-          description="Track and view all fee transactions and history."
-        />
-        <FeatureCard
-          icon={<FaChartBar size={40} className="text-orange-500" />}
-          title="Advanced Analytics"
-          description="Track school performance and student progress effortlessly."
-        />
-        <FeatureCard
-          icon={<FaCog size={40} className="text-gray-500" />}
-          title="Settings"
-          description="Manage system preferences, user roles, and more."
-        />
-      </div>
+{/* FAQ Section */}
+<section className="faq-section">
+  <div className="container">
+    <h2 className="section-title">Frequently Asked Questions</h2>
+    <div className="faq-item">
+      <h4>What is EduLedger?</h4>
+      <p>EduLedger is a blockchain-based platform that secures education credentials.</p>
+    </div>
+    <div className="faq-item">
+      <h4>How does EduLedger work?</h4>
+      <p>It uses Hedera’s blockchain technology to store, verify, and manage educational records.</p>
+    </div>
+    <div className="faq-item">
+      <h4>Is my data safe?</h4>
+      <p>Yes, Hedera ensures the highest level of security and transparency for all data.</p>
+    </div>
+  </div>
+</section>
 
-      {/* Testimonial Section */}
-      <div className="testimonial-section bg-[#F0F4F8] p-10 mt-16 rounded-xl shadow-xl">
-        <h2 className="text-2xl font-bold text-center mb-4">What Our Users Say</h2>
-        <motion.div
-          initial={{ opacity: 0, x: 100 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1 }}
-          className="testimonial-card p-6 bg-white rounded-lg shadow-lg text-center"
-        >
-          <p className="text-gray-600 italic">"{testimonials[activeTestimonial].feedback}"</p>
-          <h4 className="font-semibold text-xl mt-4">{testimonials[activeTestimonial].name}</h4>
-          <p className="text-gray-500">{testimonials[activeTestimonial].role}</p>
-        </motion.div>
-      </div>
-
-      {/* Contact Button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          className="contact-btn p-4 bg-[#2D91B9] text-white rounded-full shadow-lg hover:bg-[#1C6B81] transition-all duration-300"
-          onClick={() => alert("Contact form will appear here!")}
-        >
-          <FaCog size={24} />
-        </motion.button>
+{/* Testimonials Section */}
+<section className="testimonials-section">
+  <div className="container">
+    <h2 className="section-title">What People Are Saying</h2>
+    <div className="testimonial-card">
+      <p>
+        "EduLedger has transformed the way we manage educational records. Blockchain has provided unparalleled security and transparency."
+      </p>
+      <div className="testimonial-author">
+        <div className="avatar">A</div>
+        <div className="author-details">
+          <h4>Alex J.</h4>
+          <p>University of Blockchain</p>
+        </div>
       </div>
     </div>
-  );
-};
+  </div>
+</section>
 
-const FeatureCard = ({ icon, title, description }) => {
-  return (
-    <motion.div
-      whileHover={{ scale: 1.05, boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)" }}
-      className="feature-box p-6 bg-white shadow-lg rounded-2xl text-center transition-transform duration-300"
-    >
-      <div className="mb-4">{icon}</div>
-      <h2 className="text-xl font-semibold">{title}</h2>
-      <p className="text-gray-500 mt-2">{description}</p>
-    </motion.div>
+{/* Substack Section */}
+<section className="substack-section">
+  <div className="container">
+    <h2 className="section-title">Stay Updated</h2>
+    <div className="substack-card">
+      <a href="https://substack.com/@eduledger" target="_blank" rel="noopener noreferrer">
+        <div className="newspaper-icon">📰</div>
+        <p>Subscribe to our newsletter for the latest updates and news!</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+
+      {/* Footer Section */}
+      <footer className="footer-section">
+        <div className="container">
+          <p>&copy; 2025 EduLedger. All rights reserved.</p>
+          <div className="social-footer">
+            <a href="https://x.com/ElimuLedger" target="_blank" rel="noreferrer">
+              <FaTwitter />
+            </a>
+            <a href="https://substack.com/@eduledger" target="_blank" rel="noreferrer">
+              <FaGithub />
+            </a>
+            <a href="https://www.linkedin.com/in/bramwel-vasaka" target="_blank" rel="noreferrer">
+              <FaLinkedin />
+            </a>
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 };
 
