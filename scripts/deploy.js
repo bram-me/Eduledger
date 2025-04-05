@@ -1,18 +1,27 @@
-// Importing necessary packages and contract artifacts
-import { ethers } from "hardhat";
+import pkg from "hardhat";
 import { Client, PrivateKey, AccountId } from "@hashgraph/sdk";
 import dotenv from "dotenv";  // Load env variables from .env
 
-dotenv.config();  // Initialize dotenv
+dotenv.config();  // Initialize dotenv to load .env
+
+const { ethers } = pkg;  // Destructure ethers from the default import
 
 async function main() {
-    // Load operator credentials from .env
-    const operatorPrivateKey = PrivateKey.fromString(process.env.HEDERA_PRIVATE_KEY);
-    const operatorAccountId = AccountId.fromString(process.env.HEDERA_ACCOUNT_ID);
+    // Ensure the environment variables are loaded properly (with VITE_ prefix)
+    const operatorPrivateKey = process.env.VITE_HEDERA_PRIVATE_KEY;
+    const operatorAccountId = process.env.VITE_HEDERA_ACCOUNT_ID;
 
-    // Set up Hedera client
-    const client = Client.forTestnet(); // Switch to forMainnet() if needed
-    client.setOperator(operatorAccountId, operatorPrivateKey);
+    if (!operatorPrivateKey || !operatorAccountId) {
+        console.error("❌ Please make sure VITE_HEDERA_PRIVATE_KEY and VITE_HEDERA_ACCOUNT_ID are set in your .env file.");
+        return;
+    }
+
+    // Initialize Hedera client with the private key and account ID
+    const privateKey = PrivateKey.fromString(operatorPrivateKey);
+    const accountId = AccountId.fromString(operatorAccountId);
+
+    const client = Client.forTestnet();  // Use Client.forMainnet() if deploying to Mainnet
+    client.setOperator(accountId, privateKey);
 
     console.log("🚀 Deploying smart contracts to Hedera EVM...");
 
