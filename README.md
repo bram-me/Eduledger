@@ -7,9 +7,9 @@
 ## Table of Contents
 
 - [Overview](#overview)
-- [Features](#features)
+- [Features](#CoreFeatures)
 - [Technologies Used](#technologies-used)
-- [Installation](#installation)
+- [Installation](#InstallationGuide)
 - [Usage](#usage)
 - [File Structure](#file-structure)
 - [Contributing](#contributing)
