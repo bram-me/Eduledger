@@ -18,19 +18,35 @@ async function main() {
     // Deploy EduCertificateNFT contract
     console.log("Deploying EduCertificateNFT contract...");
     const EduCertificateNFT = await ethers.getContractFactory("EduCertificateNFT");
-    const eduCertificateNFT = await EduCertificateNFT.deploy();
-    await eduCertificateNFT.deployed();
-    console.log(`EduCertificateNFT contract deployed to: ${eduCertificateNFT.address}`);
+
+    let eduCertificateNFT;
+    try {
+        eduCertificateNFT = await EduCertificateNFT.deploy();
+        console.log("Contract deployed:", eduCertificateNFT); // Debugging line
+        const receipt = await eduCertificateNFT.deployTransaction.wait();
+        console.log(`Transaction hash for EduCertificateNFT: ${receipt.transactionHash}`);
+    } catch (error) {
+        console.error("Error deploying EduCertificateNFT contract:", error);
+        return;
+    }
+
+    // Use the deployer's address as the fee collector
+    const feeCollectorAddress = operatorAccountId.toString();
 
     // Deploy EduLedger contract
     console.log("Deploying EduLedger contract...");
-    const eduTokenAddress = process.env.EDU_TOKEN_ADDRESS; // Assuming you have a token address in your .env file
-    const feeCollectorAddress = process.env.FEE_COLLECTOR_ADDRESS; // Address to collect the fees
-    
+    const eduTokenAddress = "0x0000000000000000000000000000000000000000"; // Use zero address if no token is provided
     const EduLedger = await ethers.getContractFactory("EduLedger");
-    const eduLedger = await EduLedger.deploy(eduTokenAddress, eduCertificateNFT.address, feeCollectorAddress);
-    await eduLedger.deployed();
-    console.log(`EduLedger contract deployed to: ${eduLedger.address}`);
+    let eduLedger;
+    try {
+        eduLedger = await EduLedger.deploy(eduTokenAddress, eduCertificateNFT.address, feeCollectorAddress);
+        console.log("EduLedger deployed:", eduLedger);
+        const ledgerReceipt = await eduLedger.deployTransaction.wait();
+        console.log(`Transaction hash for EduLedger: ${ledgerReceipt.transactionHash}`);
+    } catch (error) {
+        console.error("Error deploying EduLedger contract:", error);
+        return;
+    }
 
     // Log deployed contract addresses
     console.log(`EduLedger Address: ${eduLedger.address}`);
