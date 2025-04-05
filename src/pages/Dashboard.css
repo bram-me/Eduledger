@@ -1,0 +1,223 @@
+/* General Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  background: #f5f7fa;
+  color: #333;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background: linear-gradient(135deg, #1d3b58, #15263f);
+  height: 100vh;
+  color: white;
+  padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  transition: all 0.3s ease;
+  box-shadow: 2px 0px 8px rgba(0, 0, 0, 0.2);
+  overflow-y: auto; /* Scrollbar added */
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.sidebar-header h2 {
+  font-size: 1.8rem;
+  margin-left: 10px;
+}
+
+.sidebar-link {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 12px 20px;
+  margin: 8px 0;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.sidebar-link.active,
+.sidebar-link:hover {
+  background-color: #1e3a5f;
+  transform: scale(1.05);
+}
+
+/* Sidebar collapsed state (if needed) */
+.sidebar.collapsed {
+  width: 70px;
+}
+
+.sidebar.collapsed .sidebar-link {
+  text-align: center;
+}
+
+.sidebar-item {
+  cursor: pointer;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+}
+
+.sidebar-item:hover {
+  background-color: #1e3a5f;
+}
+
+.sidebar-icon {
+  margin-right: 10px;
+}
+
+.sidebar-footer {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+/* Main Content */
+.main-content {
+  margin-left: 250px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  display: block; /* Default to visible */
+}
+
+.main-content.hidden {
+  display: none; /* Hide content */
+}
+
+h1, h2, h3 {
+  font-weight: 700;
+  color: #333;
+}
+
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.dashboard-card .text-2xl {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.card-blue {
+  background-color: #eff6ff;
+  color: #3b82f6;
+}
+
+.card-green {
+  background-color: #d1fae5;
+  color: #10b981;
+}
+
+.card-yellow {
+  background-color: #fef3c7;
+  color: #f59e0b;
+}
+
+.card-purple {
+  background-color: #f3e8ff;
+  color: #8b5cf6;
+}
+
+/* Recent Activity */
+.recent-activity {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.activity-item {
+  margin-bottom: 15px;
+}
+
+.activity-item p {
+  font-size: 1rem;
+}
+
+.activity-item span {
+  font-size: 0.875rem;
+}
+
+/* Quick Actions */
+.quick-actions-btns {
+  display: flex;
+  gap: 15px;
+}
+
+.quick-action-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: center;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.btn-blue {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.btn-blue:hover {
+  background-color: #2563eb;
+}
+
+.btn-green {
+  background-color: #10b981;
+  color: white;
+}
+
+.btn-green:hover {
+  background-color: #059669;
+}
+
+.btn-yellow {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.btn-yellow:hover {
+  background-color: #d97706;
+}
+
+/* ============================ */
+/* Remove mobile-specific styles */
+/* ============================ */
+
+

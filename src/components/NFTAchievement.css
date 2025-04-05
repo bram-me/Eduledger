@@ -1,0 +1,93 @@
+/* NFTAchievement.css */
+.nft-achievement {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .nft-achievement h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .input-group {
+    margin-bottom: 20px;
+  }
+  
+  .input-group label {
+    display: block;
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 8px;
+  }
+  
+  .input-group input, .input-group select, .input-group textarea {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .input-group textarea {
+    height: 100px;
+  }
+  
+  .issue-button {
+    padding: 12px 24px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 100%;
+    max-width: 250px;
+  }
+  
+  .issue-button:disabled {
+    background-color: #aaa;
+  }
+  
+  .spinner {
+    animation: spin 1s linear infinite;
+  }
+  
+  .status-message {
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .status-message.success {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .status-message.error {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .status-message svg {
+    margin-right: 10px;
+  }
+  
+  .nft-id {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    color: #333;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  

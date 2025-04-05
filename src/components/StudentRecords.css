@@ -1,0 +1,246 @@
+/* StudentRecords.css */
+
+.student-records {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  max-width: 800px;
+  margin: 0 auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-bar input {
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 16px;
+  flex: 1;
+  margin-right: 10px;
+}
+
+.search-icon {
+  font-size: 1.5rem;
+  color: #007bff;
+}
+
+.student-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.student-table th, .student-table td {
+  padding: 12px;
+  text-align: left;
+}
+
+.student-table th {
+  background-color: #007bff;
+  color: white;
+}
+
+.student-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.edit-icon, .delete-icon {
+  cursor: pointer;
+  font-size: 1.2rem;
+  margin-right: 10px;
+}
+
+.delete-icon:hover {
+  color: red;
+}
+
+.confirmation-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  width: 300px;
+}
+
+.modal-actions {
+  margin-top: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  margin: 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-confirm {
+  background-color: #4caf50;
+  color: white;
+}
+
+.btn-cancel {
+  background-color: #f44336;
+  color: white;
+}
+
+.spinner {
+  animation: spin 1s infinite linear;
+  margin-right: 10px;
+}
+
+/* Modal styling */
+.confirmation-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.btn-confirm, .btn-cancel {
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.btn-confirm {
+  background-color: green;
+  color: white;
+}
+
+.btn-cancel {
+  background-color: red;
+  color: white;
+}
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+/* Student Status Badge */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.status-active {
+  background-color: green;
+  color: white;
+}
+
+.status-inactive {
+  background-color: gray;
+  color: white;
+}
+
+/* Fee Status Badge */
+.fee-status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.fee-paid {
+  background-color: green;
+  color: white;
+}
+
+.fee-pending {
+  background-color: red;
+  color: white;
+}
+
+/* Student Status Badge */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.status-active {
+  background-color: green;
+  color: white;
+}
+
+.status-inactive {
+  background-color: gray;
+  color: white;
+}
+
+/* Fee Status Badge */
+.fee-status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.fee-paid {
+  background-color: green;
+  color: white;
+}
+
+.fee-pending {
+  background-color: red;
+  color: white;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

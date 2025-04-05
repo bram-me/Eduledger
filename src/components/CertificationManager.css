@@ -1,0 +1,245 @@
+/* Certification Manager Container */
+.certification-manager {
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  max-width: 850px;
+  margin: 40px auto;
+  font-family: "Arial", sans-serif;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+/* Input Fields */
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Search Bar */
+.search-container {
+  position: relative;
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto 20px;
+}
+
+.search-input {
+  padding: 12px 40px 12px 12px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: #888;
+}
+
+/* Buttons */
+button {
+  padding: 12px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 220px;
+  display: block;
+  margin: 10px auto;
+}
+
+.issue-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+.issue-button:hover {
+  background-color: #45a049;
+}
+
+.issue-button:disabled {
+  background-color: #b0bec5;
+  cursor: not-allowed;
+}
+
+/* Issued Certificates */
+.certificate-list {
+  margin-top: 20px;
+}
+
+.certificate-item {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+}
+
+.certificate-item:hover {
+  transform: scale(1.02);
+}
+
+.certificate-item span {
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Certificate Preview */
+.preview-card {
+  background: linear-gradient(135deg, #f9f9f9, #e6e6e6);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  margin: 15px 0;
+  text-align: center;
+}
+
+.preview-card h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #444;
+  margin-bottom: 15px;
+}
+
+.preview-card p {
+  font-size: 1rem;
+  color: #555;
+  margin: 5px 0;
+}
+
+/* QR Code */
+.qr-code {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.qr-code img {
+  width: 160px;
+  height: 160px;
+  border-radius: 6px;
+  border: 2px solid #ddd;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  background-color: #f1f1f1;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.pagination button:hover {
+  background-color: #e6e6e6;
+}
+
+.pagination button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+/* NFT Buttons */
+.nft-create-button {
+  padding: 12px 24px;
+  background-color: #8e44ad;
+  color: white;
+  border-radius: 6px;
+}
+
+.nft-create-button:hover {
+  background-color: #9b59b6;
+}
+
+/* Modal */
+.certificate-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 25px;
+  border-radius: 10px;
+  width: 450px;
+  text-align: center;
+}
+
+.close-modal-button {
+  margin-top: 15px;
+  padding: 10px 18px;
+  background-color: #ff4d4d;
+  color: white;
+  border-radius: 6px;
+}
+
+.close-modal-button:hover {
+  background-color: #e60000;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+  margin: auto;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+button {
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.qr-code {
+  margin-top: 10px;
+  text-align: center;
+}
