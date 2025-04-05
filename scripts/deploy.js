@@ -1,61 +1,95 @@
-import pkg from "hardhat";
-const { ethers } = pkg;
-import { Client, PrivateKey, AccountId } from "@hashgraph/sdk";
+import fs from "fs";
+import { Client, ContractCreateTransaction, ContractFunctionParameters, AccountBalanceQuery } from "@hashgraph/sdk";
 import dotenv from "dotenv";
-dotenv.config();  // To load environment variables from the .env file
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Load environment variables
+dotenv.config();
+
+// Handle __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+async function loadArtifact(contractName) {
+    const artifactPath = path.join(__dirname, "..", "artifacts", "contracts", `${contractName}.sol`, `${contractName}.json`);
+    console.log(`Loading artifact from: ${artifactPath}`);
+    const artifactJson = fs.readFileSync(artifactPath, "utf8");
+    return JSON.parse(artifactJson);
+}
 
 async function main() {
-    // Fetch private key and account ID from environment variables
-    const operatorPrivateKey = PrivateKey.fromString(process.env.HEDERA_PRIVATE_KEY);
-    const operatorAccountId = AccountId.fromString(process.env.HEDERA_ACCOUNT_ID);
+    const operatorPrivateKey = process.env.HEDERA_PRIVATE_KEY;
+    const operatorAccountId = process.env.HEDERA_ACCOUNT_ID;
 
-    // Setup Hedera client for Testnet (or Mainnet depending on configuration)
-    const client = Client.forTestnet(); // Use Client.forMainnet() for Mainnet deployment
+    if (!operatorPrivateKey || !operatorAccountId) {
+        throw new Error("HEDERA_PRIVATE_KEY and HEDERA_ACCOUNT_ID must be set in .env file.");
+    }
+
+    const client = Client.forTestnet(); // Change to forMainnet() for production
     client.setOperator(operatorAccountId, operatorPrivateKey);
 
-    console.log("Deploying smart contracts to Hedera...");
+    // Check account balance
+    const balance = await new AccountBalanceQuery()
+        .setAccountId(operatorAccountId)
+        .execute(client);
 
-    // Deploy EduCertificateNFT contract
-    console.log("Deploying EduCertificateNFT contract...");
-    const EduCertificateNFT = await ethers.getContractFactory("EduCertificateNFT");
+    const balanceInHbars = balance.hbars.toTinybars() / 1e8;
+    console.log(`Account balance: ${balanceInHbars} HBAR`);
 
-    let eduCertificateNFT;
-    try {
-        eduCertificateNFT = await EduCertificateNFT.deploy();
-        console.log("Contract deployed:", eduCertificateNFT); // Debugging line
-        const receipt = await eduCertificateNFT.deployTransaction.wait();
-        console.log(`Transaction hash for EduCertificateNFT: ${receipt.transactionHash}`);
-    } catch (error) {
-        console.error("Error deploying EduCertificateNFT contract:", error);
-        return;
+    if (balanceInHbars < 1) {
+        throw new Error("Insufficient HBAR balance for deployment.");
     }
 
-    // Use the deployer's address as the fee collector
-    const feeCollectorAddress = operatorAccountId.toString();
+    console.log("Deploying contracts...");
 
-    // Deploy EduLedger contract
-    console.log("Deploying EduLedger contract...");
-    const eduTokenAddress = "0x0000000000000000000000000000000000000000"; // Use zero address if no token is provided
-    const EduLedger = await ethers.getContractFactory("EduLedger");
-    let eduLedger;
     try {
-        eduLedger = await EduLedger.deploy(eduTokenAddress, eduCertificateNFT.address, feeCollectorAddress);
-        console.log("EduLedger deployed:", eduLedger);
-        const ledgerReceipt = await eduLedger.deployTransaction.wait();
-        console.log(`Transaction hash for EduLedger: ${ledgerReceipt.transactionHash}`);
-    } catch (error) {
-        console.error("Error deploying EduLedger contract:", error);
-        return;
-    }
+        // Deploy EduCertificateNFT
+        const eduCertificateNFTArtifact = await loadArtifact("EduCertificateNFT");
+        const eduCertificateNFTBytecode = eduCertificateNFTArtifact.bytecode;
 
-    // Log deployed contract addresses
-    console.log(`EduLedger Address: ${eduLedger.address}`);
-    console.log(`EduCertificateNFT Address: ${eduCertificateNFT.address}`);
+        console.log("Deploying EduCertificateNFT...");
+        const eduCertificateNFTTx = await new ContractCreateTransaction()
+            .setBytecode(eduCertificateNFTBytecode)
+            .setGas(5_000_000) // 5 million gas
+            .execute(client);
+
+        const eduCertificateNFTReceipt = await eduCertificateNFTTx.getReceipt(client);
+        const eduCertificateNFTContractId = eduCertificateNFTReceipt.contractId;
+
+        console.log(`✅ EduCertificateNFT deployed at: ${eduCertificateNFTContractId}`);
+
+        // Deploy EduLedger
+        const eduLedgerArtifact = await loadArtifact("EduLedger");
+        const eduLedgerBytecode = eduLedgerArtifact.bytecode;
+
+        console.log("Deploying EduLedger...");
+        const eduLedgerTx = await new ContractCreateTransaction()
+            .setBytecode(eduLedgerBytecode)
+            .setGas(5_000_000) // Adjust gas as needed
+            .setConstructorParameters(
+                new ContractFunctionParameters()
+                    .addAddress(eduCertificateNFTContractId.toSolidityAddress())
+                    .addAddress(operatorAccountId.toSolidityAddress())
+            )
+            .execute(client);
+
+        const eduLedgerReceipt = await eduLedgerTx.getReceipt(client);
+        const eduLedgerContractId = eduLedgerReceipt.contractId;
+
+        console.log(`✅ EduLedger deployed at: ${eduLedgerContractId}`);
+
+    } catch (error) {
+        console.error("❌ Deployment failed:", error);
+    }
 }
 
 main()
-    .then(() => process.exit(0))
+    .then(() => {
+        console.log("🎉 Deployment script finished.");
+        process.exit(0);
+    })
     .catch((error) => {
-        console.error("Error during deployment:", error);
+        console.error("❌ Error during deployment:", error);
         process.exit(1);
     });
