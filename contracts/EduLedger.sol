@@ -1,123 +1,158 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.19;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-// EduLedger contract for school management
-contract EduLedger is Ownable {
-    using Counters for Counters.Counter;
 
-    Counters.Counter private _studentIdCounter;
-    Counters.Counter private _courseIdCounter;
-    Counters.Counter private _transactionIdCounter;
+interface IEduCertificateNFT {
+    function mintCertificate(address to, string memory uri) external returns (uint256);
+}
 
-    struct Student {
-        uint256 id;
-        string name;
-        string course;
-        string grade;
-        bool enrolled;
-    }
+contract EduLedger is AccessControl {
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    bytes32 public constant TEACHER_ROLE = keccak256("TEACHER_ROLE");
+    bytes32 public constant STUDENT_ROLE = keccak256("STUDENT_ROLE");
 
     struct Course {
-        uint256 id;
-        string courseName;
-        uint256 fee;
+        string title;
+        string description;
+        address teacher;
+        uint256 feeHBAR;
+        uint256 feeToken;
+        bool exists;
+        bool active;
     }
 
-    struct Payment {
-        uint256 transactionId;
-        uint256 studentId;
-        uint256 amount;
-        uint256 date;
+    struct Record {
+        string grade;
+        string note;
+        bool completed;
+        bool certified;
     }
 
-    mapping(uint256 => Student) public students;
+    IERC20 public eduToken;
+    IEduCertificateNFT public certificateNFT;
+    address public feeCollector;
+
+    uint256 public courseCounter;
     mapping(uint256 => Course) public courses;
-    mapping(uint256 => Payment) public payments;
+    mapping(uint256 => address[]) public courseStudents;
+    mapping(address => mapping(uint256 => Record)) public studentRecords;
+    mapping(uint256 => mapping(address => bool)) public isStudentEnrolled;
 
-    event StudentRegistered(uint256 studentId, string name);
-    event CourseRegistered(uint256 courseId, string courseName, uint256 fee);
-    event PaymentMade(uint256 transactionId, uint256 studentId, uint256 amount);
+    event CourseCreated(uint256 indexed courseId, string title);
+    event CourseUpdated(uint256 indexed courseId, bool active);
+    event StudentEnrolled(address indexed student, uint256 indexed courseId);
+    event PaymentReceived(address indexed student, uint256 indexed courseId, uint256 amount, string paymentType);
+    event CourseCompleted(address indexed student, uint256 indexed courseId);
+    event CertificateIssued(address indexed student, uint256 indexed courseId);
+    event CertificateRevoked(address indexed student, uint256 indexed courseId);
 
-    modifier onlyStudent(uint256 studentId) {
-        require(students[studentId].enrolled, "Student not enrolled");
+    constructor(address _eduToken, address _nft, address _feeCollector) {
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(ADMIN_ROLE, msg.sender);
+        eduToken = IERC20(_eduToken);
+        certificateNFT = IEduCertificateNFT(_nft);
+        feeCollector = _feeCollector;
+    }
+
+    modifier onlyTeacherOf(uint256 courseId) {
+        require(courses[courseId].exists, "Course does not exist");
+        require(courses[courseId].teacher == msg.sender, "Not authorized");
         _;
     }
 
-    // Register a student
-    function registerStudent(string memory name, string memory course) external {
-        uint256 studentId = _studentIdCounter.current();
-        _studentIdCounter.increment();
-
-        students[studentId] = Student({
-            id: studentId,
-            name: name,
-            course: course,
-            grade: "",
-            enrolled: true
-        });
-
-        emit StudentRegistered(studentId, name);
+    function createCourse(string memory _title, string memory _description, uint256 _feeHBAR, uint256 _feeToken) external onlyRole(TEACHER_ROLE) {
+        uint256 courseId = ++courseCounter;
+        courses[courseId] = Course(_title, _description, msg.sender, _feeHBAR, _feeToken, true, true);
+        emit CourseCreated(courseId, _title);
     }
 
-    // Register a course
-    function registerCourse(string memory courseName, uint256 fee) external onlyOwner {
-        uint256 courseId = _courseIdCounter.current();
-        _courseIdCounter.increment();
-
-        courses[courseId] = Course({
-            id: courseId,
-            courseName: courseName,
-            fee: fee
-        });
-
-        emit CourseRegistered(courseId, courseName, fee);
+    function toggleCourseStatus(uint256 courseId, bool active) external onlyTeacherOf(courseId) {
+        courses[courseId].active = active;
+        emit CourseUpdated(courseId, active);
     }
 
-    // Make payment for course
-    function makePayment(uint256 studentId, uint256 amount) external onlyStudent(studentId) {
-        uint256 transactionId = _transactionIdCounter.current();
-        _transactionIdCounter.increment();
+    function enrollHBAR(uint256 courseId) external payable onlyRole(STUDENT_ROLE) {
+        Course storage course = courses[courseId];
+        require(course.exists && course.active, "Inactive or nonexistent course");
+        require(!isStudentEnrolled[courseId][msg.sender], "Already enrolled");
+        require(msg.value >= course.feeHBAR, "Insufficient HBAR");
 
-        Payment memory payment = Payment({
-            transactionId: transactionId,
-            studentId: studentId,
-            amount: amount,
-            date: block.timestamp
-        });
+        courseStudents[courseId].push(msg.sender);
+        isStudentEnrolled[courseId][msg.sender] = true;
 
-        payments[transactionId] = payment;
-
-        emit PaymentMade(transactionId, studentId, amount);
+        emit StudentEnrolled(msg.sender, courseId);
+        emit PaymentReceived(msg.sender, courseId, msg.value, "HBAR");
+        payable(feeCollector).transfer(msg.value);
     }
 
-    // Set grade for a student
-    function setGrade(uint256 studentId, string memory grade) external onlyOwner {
-        require(students[studentId].enrolled, "Student not found");
-        students[studentId].grade = grade;
+    function enrollToken(uint256 courseId) external onlyRole(STUDENT_ROLE) {
+        Course storage course = courses[courseId];
+        require(course.exists && course.active, "Inactive or nonexistent course");
+        require(!isStudentEnrolled[courseId][msg.sender], "Already enrolled");
+
+        require(eduToken.transferFrom(msg.sender, feeCollector, course.feeToken), "Token transfer failed");
+        courseStudents[courseId].push(msg.sender);
+        isStudentEnrolled[courseId][msg.sender] = true;
+
+        emit StudentEnrolled(msg.sender, courseId);
+        emit PaymentReceived(msg.sender, courseId, course.feeToken, "TOKEN");
     }
 
-    // Get student details
-    function getStudent(uint256 studentId) external view returns (string memory name, string memory course, string memory grade) {
-        require(students[studentId].enrolled, "Student not found");
-        Student memory student = students[studentId];
-        return (student.name, student.course, student.grade);
+    function addRecord(uint256 courseId, address student, string memory grade, string memory note) external onlyTeacherOf(courseId) {
+        require(isStudentEnrolled[courseId][student], "Student not enrolled");
+        Record storage record = studentRecords[student][courseId];
+        record.grade = grade;
+        record.note = note;
     }
 
-    // Get course details
-    function getCourse(uint256 courseId) external view returns (string memory courseName, uint256 fee) {
-        require(courses[courseId].id != 0, "Course not found");
-        Course memory course = courses[courseId];
-        return (course.courseName, course.fee);
+    function markCourseCompleted(uint256 courseId, address student, string memory certURI) external onlyTeacherOf(courseId) {
+        require(isStudentEnrolled[courseId][student], "Not enrolled");
+        Record storage record = studentRecords[student][courseId];
+        require(!record.completed, "Already marked");
+
+        record.completed = true;
+        emit CourseCompleted(student, courseId);
+
+        if (!record.certified) {
+            certificateNFT.mintCertificate(student, certURI);
+            record.certified = true;
+            emit CertificateIssued(student, courseId);
+        }
     }
 
-    // Get payment details
-    function getPayment(uint256 transactionId) external view returns (uint256 studentId, uint256 amount, uint256 date) {
-        require(payments[transactionId].transactionId != 0, "Payment not found");
-        Payment memory payment = payments[transactionId];
-        return (payment.studentId, payment.amount, payment.date);
+    function revokeCertificate(uint256 courseId, address student) external onlyTeacherOf(courseId) {
+        Record storage record = studentRecords[student][courseId];
+        require(record.certified, "No certificate to revoke");
+        record.certified = false;
+        emit CertificateRevoked(student, courseId);
+    }
+
+    function getStudents(uint256 courseId) external view returns (address[] memory) {
+        return courseStudents[courseId];
+    }
+
+    function setFeeCollector(address _collector) external onlyRole(ADMIN_ROLE) {
+        feeCollector = _collector;
+    }
+
+    function withdrawHBAR() external onlyRole(ADMIN_ROLE) {
+        payable(feeCollector).transfer(address(this).balance);
+    }
+
+    function withdrawToken() external onlyRole(ADMIN_ROLE) {
+        uint256 balance = eduToken.balanceOf(address(this));
+        require(balance > 0, "No tokens to withdraw");
+        require(eduToken.transfer(feeCollector, balance), "Transfer failed");
+    }
+
+    function grantStudent(address student) external onlyRole(ADMIN_ROLE) {
+        _grantRole(STUDENT_ROLE, student);
+    }
+
+    function grantTeacher(address teacher) external onlyRole(ADMIN_ROLE) {
+        _grantRole(TEACHER_ROLE, teacher);
     }
 }

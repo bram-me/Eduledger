@@ -1,56 +1,50 @@
 // Importing necessary packages and contract artifacts
-const { ethers } = require("hardhat");
-const { Client, PrivateKey, AccountId } = require("@hashgraph/sdk");
-require("dotenv").config();  // To load environment variables from the .env file
+import { ethers } from "hardhat";
+import { Client, PrivateKey, AccountId } from "@hashgraph/sdk";
+import dotenv from "dotenv";  // Load env variables from .env
 
-// Main function to deploy contracts
+dotenv.config();  // Initialize dotenv
+
 async function main() {
-    // Fetch private key and account ID from environment variables
+    // Load operator credentials from .env
     const operatorPrivateKey = PrivateKey.fromString(process.env.HEDERA_PRIVATE_KEY);
     const operatorAccountId = AccountId.fromString(process.env.HEDERA_ACCOUNT_ID);
 
-    // Setup Hedera client for Testnet (or Mainnet depending on configuration)
-    const client = Client.forTestnet(); // Use Client.forMainnet() for Mainnet deployment
+    // Set up Hedera client
+    const client = Client.forTestnet(); // Switch to forMainnet() if needed
     client.setOperator(operatorAccountId, operatorPrivateKey);
 
-    // Log the deployment process
-    console.log("Deploying contracts to Hedera...");
+    console.log("🚀 Deploying smart contracts to Hedera EVM...");
 
     // Deploy EduLedger contract
-    console.log("Deploying EduLedger contract...");
     const EduLedger = await ethers.getContractFactory("EduLedger");
     const eduLedger = await EduLedger.deploy();
     await eduLedger.deployed();
-    console.log(`EduLedger contract deployed to: ${eduLedger.address}`);
+    console.log("✅ EduLedger deployed at:", eduLedger.address);
 
     // Deploy EduCertificateNFT contract
-    console.log("Deploying EduCertificateNFT contract...");
     const EduCertificateNFT = await ethers.getContractFactory("EduCertificateNFT");
     const eduCertificateNFT = await EduCertificateNFT.deploy();
     await eduCertificateNFT.deployed();
-    console.log(`EduCertificateNFT contract deployed to: ${eduCertificateNFT.address}`);
+    console.log("✅ EduCertificateNFT deployed at:", eduCertificateNFT.address);
 
-    // Optionally, link EduLedger contract with EduCertificateNFT contract
+    // Link the NFT contract to the EduLedger contract
     try {
-        console.log("Linking EduLedger contract to EduCertificateNFT contract...");
-        await eduLedger.setNFTContractAddress(eduCertificateNFT.address); // Assuming you have a method for this
-        console.log(`EduLedger linked to EduCertificateNFT at: ${eduCertificateNFT.address}`);
-    } catch (err) {
-        console.error("Error linking EduLedger contract to EduCertificateNFT:", err);
+        console.log("🔗 Linking EduLedger with EduCertificateNFT...");
+        const tx = await eduLedger.setNFTContractAddress(eduCertificateNFT.address); // assumes such function exists
+        await tx.wait();
+        console.log("✅ Linked successfully.");
+    } catch (error) {
+        console.error("❌ Error linking contracts:", error.message);
     }
 
-    // Log confirmation of successful deployment
-    console.log(`Contracts deployed successfully to Hedera!`);
-
-    // Log deployed contract addresses (you can use these in your front-end or future transactions)
-    console.log(`EduLedger Address: ${eduLedger.address}`);
-    console.log(`EduCertificateNFT Address: ${eduCertificateNFT.address}`);
+    console.log("\n🎉 Deployment complete!");
+    console.log(`📘 EduLedger Address: ${eduLedger.address}`);
+    console.log(`📗 EduCertificateNFT Address: ${eduCertificateNFT.address}`);
 }
 
-// Run the deployment script
-main()
-    .then(() => process.exit(0)) // Exit on success
-    .catch((error) => {
-        console.error("Error during deployment:", error);
-        process.exit(1); // Exit with error code if something goes wrong
-    });
+// Run main
+main().catch((error) => {
+    console.error("❌ Deployment failed:", error);
+    process.exit(1);
+});

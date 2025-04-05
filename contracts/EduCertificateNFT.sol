@@ -3,10 +3,13 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract EduCertificateNFT is ERC721URIStorage, AccessControl {
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIds;
+
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-    uint256 public tokenCounter;
 
     struct CertificateData {
         string courseName;
@@ -33,7 +36,9 @@ contract EduCertificateNFT is ERC721URIStorage, AccessControl {
         string memory grade,
         string memory issuedDate
     ) external onlyRole(MINTER_ROLE) returns (uint256) {
-        uint256 tokenId = ++tokenCounter;
+        _tokenIds.increment();
+        uint256 tokenId = _tokenIds.current();
+
         _mint(student, tokenId);
         _setTokenURI(tokenId, tokenURI);
 
@@ -49,6 +54,7 @@ contract EduCertificateNFT is ERC721URIStorage, AccessControl {
     }
 
     function burnCertificate(uint256 tokenId) external onlyRole(MINTER_ROLE) {
+        require(_exists(tokenId), "Token does not exist");
         _burn(tokenId);
         delete certificateDetails[tokenId];
         emit CertificateBurned(tokenId);
@@ -65,5 +71,16 @@ contract EduCertificateNFT is ERC721URIStorage, AccessControl {
     function getCertificateData(uint256 tokenId) external view returns (CertificateData memory) {
         require(_exists(tokenId), "Token does not exist");
         return certificateDetails[tokenId];
+    }
+
+    // ✅ FIXED override to resolve multiple inheritance issue
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC721URIStorage, AccessControl)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
     }
 }

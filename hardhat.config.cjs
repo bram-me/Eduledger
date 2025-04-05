@@ -1,3 +1,5 @@
+/* eslint-env node */
+
 require("@nomicfoundation/hardhat-toolbox");
 
 /** @type import('hardhat/config').HardhatUserConfig */
