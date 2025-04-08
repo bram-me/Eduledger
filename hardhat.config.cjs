@@ -1,19 +1,19 @@
-require('dotenv').config();  // To load .env variables
+require('dotenv').config();
 
 module.exports = {
   solidity: {
-    version: "0.8.28",  // Your Solidity version
+    version: "0.8.28",
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200  // Typical optimization setting
+        runs: 200
       }
     }
   },
   networks: {
     hedera: {
-      url: 'https://testnet.hedera.com/api/v1', // Testnet endpoint (change to mainnet if needed)
-      accounts: [`${process.env.HEDERA_PRIVATE_KEY}`] // Ensure the private key is passed as a 32-byte HEX string
+      url: 'https://testnet.hashio.io/api',
+      accounts: [process.env.HEDERA_PRIVATE_KEY]
     }
   }
 };

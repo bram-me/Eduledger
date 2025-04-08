@@ -1,24 +1,81 @@
 import dotenv from 'dotenv';
-import { Client, PrivateKey, AccountBalanceQuery, AccountInfoQuery, ContractCreateTransaction, ContractFunctionParameters } from '@hashgraph/sdk';
+import {
+  Client,
+  AccountInfoQuery,
+  FileCreateTransaction,
+  FileAppendTransaction,
+  ContractCreateTransaction,
+  ContractFunctionParameters,
+  Hbar
+} from '@hashgraph/sdk';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'url';
 
-// Load environment variables
 dotenv.config();
 
-// Handle __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Function to load the compiled artifact JSON file
 async function loadArtifact(contractName) {
-    const artifactPath = path.join(__dirname, "..", "artifacts", "contracts", `${contractName}.sol`, `${contractName}.json`);
-    console.log(`Loading artifact from: ${artifactPath}`);
-    const artifactJson = fs.readFileSync(artifactPath, "utf8");
-    return JSON.parse(artifactJson);
+  const artifactPath = path.join(__dirname, "..", "artifacts", "contracts", `${contractName}.sol`, `${contractName}.json`);
+  console.log(`📦 Loading artifact from: ${artifactPath}`);
+  const artifactJson = fs.readFileSync(artifactPath, "utf8");
+  return JSON.parse(artifactJson);
 }
 
-// Main function to run the deployment script
+// Function to deploy a large contract by uploading its bytecode in chunks.
+async function deployLargeContract(client, bytecodeBuffer, gas = 5_000_000, constructorParams = new ContractFunctionParameters()) {
+  // Adjust the max chunk size to 3000 bytes to use many chunks.
+  const MAX_CHUNK_SIZE = 3000;
+  const totalChunks = Math.ceil(bytecodeBuffer.length / MAX_CHUNK_SIZE);
+  console.log(`🚀 Splitting bytecode into ${totalChunks} chunks...`);
+
+  // Create the file with the first chunk of the bytecode.
+  const createFileTx = await new FileCreateTransaction()
+    .setKeys([client.operatorPublicKey])
+    .setContents(bytecodeBuffer.slice(0, MAX_CHUNK_SIZE))
+    .setMaxTransactionFee(new Hbar(2))
+    .execute(client);
+
+  const createFileRx = await createFileTx.getReceipt(client);
+  const fileId = createFileRx.fileId;
+
+  if (!fileId) throw new Error("❌ Failed to create bytecode file.");
+
+  console.log(`✅ Bytecode file created. File ID: ${fileId}`);
+
+  // Append the remaining chunks of the bytecode.
+  for (let i = MAX_CHUNK_SIZE; i < bytecodeBuffer.length; i += MAX_CHUNK_SIZE) {
+    const chunk = bytecodeBuffer.slice(i, i + MAX_CHUNK_SIZE);
+    console.log(`📦 Uploading chunk ${Math.floor(i / MAX_CHUNK_SIZE) + 1} of ${totalChunks}...`);
+    await new FileAppendTransaction()
+      .setFileId(fileId)
+      .setContents(chunk)
+      .setMaxTransactionFee(new Hbar(2))
+      .execute(client);
+  }
+
+  console.log(`✅ Bytecode uploaded in ${totalChunks} chunks. File ID: ${fileId}`);
+
+  // Deploy the contract using the uploaded bytecode file.
+  const contractTx = await new ContractCreateTransaction()
+    .setBytecodeFileId(fileId)
+    .setGas(gas)
+    .setConstructorParameters(constructorParams)
+    .execute(client);
+
+  const contractRx = await contractTx.getReceipt(client);
+  const contractId = contractRx.contractId;
+
+  if (!contractId) throw new Error("❌ Failed to deploy contract.");
+
+  console.log(`✅ Contract deployed at: ${contractId}`);
+  return contractId;
+}
+
+// Main deployment function
 async function main() {
   const operatorPrivateKey = process.env.HEDERA_PRIVATE_KEY || process.env.PRIVATE_KEY;
   const operatorAccountId = process.env.HEDERA_ACCOUNT_ID || process.env.ACCOUNT_ID;
@@ -27,91 +84,61 @@ async function main() {
     throw new Error("⚠️ HEDERA_PRIVATE_KEY and HEDERA_ACCOUNT_ID must be set in .env file.");
   }
 
-  // Connect to Hedera Testnet (or Mainnet)
-  const client = Client.forTestnet(); // Use Client.forMainnet() for production
+  const client = Client.forTestnet(); // Change to forMainnet() for production deployment
   client.setOperator(operatorAccountId, operatorPrivateKey);
 
   try {
-    console.log("🔎 Checking account info...");
-
-    // Fetch account info
     const accountInfo = await new AccountInfoQuery()
       .setAccountId(operatorAccountId)
       .execute(client);
 
-    console.log("🔍 Account Info:", accountInfo);
+    const balance = accountInfo.balance.toTinybars().toNumber() / 1e8;
+    console.log(`✅ Connected. Account balance: ${balance} HBAR`);
 
-    if (!accountInfo || !accountInfo.balance) {
-      throw new Error("❌ Account info or balance is undefined.");
-    }
+    if (balance < 1) throw new Error("❌ Insufficient HBAR for deployment.");
 
-    // Extract the balance in tinybars and convert it to HBAR
-    const balanceInTinybars = accountInfo.balance._valueInTinybar;
-    const balanceInHbars = balanceInTinybars / 1e8; // Convert tinybars to HBAR (1 HBAR = 1e8 tinybars)
-    console.log(`✅ Connected! Account balance: ${balanceInHbars} HBAR`);
-
-    if (balanceInHbars < 1) {
-      throw new Error("❌ Insufficient HBAR balance for deployment.");
-    }
-
-    console.log("🚀 Deploying contracts...");
-
-    // Deploy EduCertificateNFT
+    // --- Deploy EduCertificateNFT Contract ---
     const eduCertificateNFTArtifact = await loadArtifact("EduCertificateNFT");
-    const eduCertificateNFTBytecode = eduCertificateNFTArtifact.bytecode;
-
-    console.log("📜 Deploying EduCertificateNFT...");
-    const eduCertificateNFTTx = await new ContractCreateTransaction()
-      .setBytecode(eduCertificateNFTBytecode)
-      .setGas(5_000_000)
-      .execute(client);
-
-    const eduCertificateNFTReceipt = await eduCertificateNFTTx.getReceipt(client);
-    const eduCertificateNFTContractId = eduCertificateNFTReceipt.contractId;
-
-    if (!eduCertificateNFTContractId) {
-      throw new Error("❌ Failed to deploy EduCertificateNFT contract.");
+    // Try to get bytecode from either 'bytecode' or 'deployedBytecode' field.
+    const eduCertificateNFTBytecode = eduCertificateNFTArtifact.bytecode || eduCertificateNFTArtifact.deployedBytecode;
+    if (!eduCertificateNFTBytecode) {
+      throw new Error("❌ Bytecode not found in artifact for EduCertificateNFT.");
     }
+    // Remove any leading "0x" and convert to Buffer.
+    const nftBuffer = Buffer.from(eduCertificateNFTBytecode.replace(/^0x/, ''), 'hex');
 
-    console.log(`✅ EduCertificateNFT deployed at: ${eduCertificateNFTContractId.toString()}`);
-
-    // Deploy EduLedger
+    console.log("🚀 Deploying EduCertificateNFT...");
+    const eduCertificateNFTContractId = await deployLargeContract(client, nftBuffer);
+    
+    // --- Deploy EduLedger Contract ---
     const eduLedgerArtifact = await loadArtifact("EduLedger");
-    const eduLedgerBytecode = eduLedgerArtifact.bytecode;
-
-    console.log("📜 Deploying EduLedger...");
-    const eduLedgerTx = await new ContractCreateTransaction()
-      .setBytecode(eduLedgerBytecode)
-      .setGas(5_000_000)
-      .setConstructorParameters(
-        new ContractFunctionParameters()
-          .addAddress(eduCertificateNFTContractId.toSolidityAddress())
-          .addAddress(operatorAccountId.toSolidityAddress())
-      )
-      .execute(client);
-
-    const eduLedgerReceipt = await eduLedgerTx.getReceipt(client);
-    const eduLedgerContractId = eduLedgerReceipt.contractId;
-
-    if (!eduLedgerContractId) {
-      throw new Error("❌ Failed to deploy EduLedger contract.");
+    const eduLedgerBytecode = eduLedgerArtifact.bytecode || eduLedgerArtifact.deployedBytecode;
+    if (!eduLedgerBytecode) {
+      throw new Error("❌ Bytecode not found in artifact for EduLedger.");
     }
+    const ledgerBuffer = Buffer.from(eduLedgerBytecode.replace(/^0x/, ''), 'hex');
 
-    console.log(`✅ EduLedger deployed at: ${eduLedgerContractId.toString()}`);
+    const constructorParams = new ContractFunctionParameters()
+      .addAddress(eduCertificateNFTContractId.toSolidityAddress())
+      .addAddress(operatorAccountId.toSolidityAddress());
 
+    console.log("🚀 Deploying EduLedger...");
+    const eduLedgerContractId = await deployLargeContract(client, ledgerBuffer, 5_000_000, constructorParams);
+
+    console.log(`🎉 EduCertificateNFT Contract: ${eduCertificateNFTContractId}`);
+    console.log(`🎉 EduLedger Contract: ${eduLedgerContractId}`);
   } catch (error) {
     console.error("❌ Deployment failed:", error);
     process.exit(1);
   }
 }
 
-// Execute the main function
 main()
   .then(() => {
-    console.log("🎉 Deployment script finished.");
+    console.log("✅ Deployment script completed.");
     process.exit(0);
   })
   .catch((error) => {
-    console.error("❌ Error during deployment:", error);
+    console.error("❌ Fatal error during deployment:", error);
     process.exit(1);
   });
