@@ -20,14 +20,15 @@ contract EduCertificateNFT is ERC721URIStorage, AccessControl {
         string issuedDate;
         string templateURI;  // Custom template URI
         uint256 expirationDate;  // Expiration date
+        string institution; // Store the institution
     }
 
     mapping(uint256 => CertificateData) public certificateDetails;
-    mapping(uint256 => bool) public certificateUsed;  // Track if certificate is used
-    mapping(address => bool) public eligibleForDiscount;  // Track discount eligibility
-    mapping(address => address) public referrals;  // Track referrals
-    mapping(address => uint256[]) public studentCourses;  // Track courses for students
-    mapping(uint256 => Course) public courseCatalog;  // Course catalog
+    mapping(address => bool) public eligibleForDiscount;  // Tracking eligibility for discount
+    mapping(uint256 => bool) public certificateUsed;  // Tracking if the certificate is used
+    mapping(uint256 => Course) public courseCatalog;  // Catalog of courses
+    mapping(address => address) public referrals;  // Referral mapping
+    mapping(address => uint256[]) public studentCourses;  // Student courses mapping
 
     event CertificateMinted(address indexed student, uint256 indexed tokenId, string uri);
     event CertificateBurned(uint256 indexed tokenId);
@@ -50,6 +51,7 @@ contract EduCertificateNFT is ERC721URIStorage, AccessControl {
         _grantRole(ADMIN_ROLE, msg.sender);
     }
 
+    // Define mintCertificate as internal
     function mintCertificate(
         address student,
         string memory tokenURI,
@@ -58,8 +60,9 @@ contract EduCertificateNFT is ERC721URIStorage, AccessControl {
         string memory grade,
         string memory issuedDate,
         uint256 expirationDate,
-        string memory templateURI
-    ) external onlyRole(MINTER_ROLE) returns (uint256) {
+        string memory templateURI,
+        string memory institution // Add institution here
+    ) internal returns (uint256) {
         _tokenIds.increment();
         uint256 tokenId = _tokenIds.current();
 
@@ -72,11 +75,29 @@ contract EduCertificateNFT is ERC721URIStorage, AccessControl {
             grade: grade,
             issuedDate: issuedDate,
             expirationDate: expirationDate,
-            templateURI: templateURI
+            templateURI: templateURI,
+            institution: institution // Store institution here
         });
 
         emit CertificateMinted(student, tokenId, tokenURI);
         return tokenId;
+    }
+
+    // Define mintCertificateWithDiscount (without discountPercentage)
+    function mintCertificateWithDiscount(
+        address student,
+        string memory tokenURI,
+        string memory courseName,
+        string memory studentName,
+        string memory grade,
+        string memory issuedDate,
+        uint256 expirationDate,
+        string memory templateURI,
+        string memory institution // Add institution here
+    ) external onlyRole(MINTER_ROLE) returns (uint256) {
+        require(eligibleForDiscount[student], "Student is not eligible for discount");
+        // Apply discount logic here (if any)
+        return mintCertificate(student, tokenURI, courseName, studentName, grade, issuedDate, expirationDate, templateURI, institution);
     }
 
     function burnCertificate(uint256 tokenId) external onlyRole(MINTER_ROLE) {
@@ -127,30 +148,15 @@ contract EduCertificateNFT is ERC721URIStorage, AccessControl {
         emit CertificateTransferRequested(tokenId, msg.sender, to);
     }
 
-    function setCustomMetadata(uint256 tokenId, string memory institution, uint256 validityPeriod, string memory templateURI) external onlyRole(ADMIN_ROLE) {
+    // Set custom metadata for a certificate, including institution
+    function setCustomMetadata(uint256 tokenId, string memory institution, string memory templateURI) external onlyRole(ADMIN_ROLE) {
         require(_exists(tokenId), "Certificate does not exist");
         certificateDetails[tokenId].templateURI = templateURI;
-        certificateDetails[tokenId].expirationDate = block.timestamp + validityPeriod * 1 days;
+        certificateDetails[tokenId].institution = institution; // Store institution here
     }
 
     function setDiscountEligibility(address student, bool eligible) external onlyRole(ADMIN_ROLE) {
         eligibleForDiscount[student] = eligible;
-    }
-
-    function mintCertificateWithDiscount(
-        address student,
-        string memory tokenURI,
-        string memory courseName,
-        string memory studentName,
-        string memory grade,
-        string memory issuedDate,
-        uint256 expirationDate,
-        string memory templateURI,
-        uint256 discountPercentage
-    ) external onlyRole(MINTER_ROLE) returns (uint256) {
-        require(eligibleForDiscount[student], "Student is not eligible for discount");
-        // Apply discount logic here
-        return mintCertificate(student, tokenURI, courseName, studentName, grade, issuedDate, expirationDate, templateURI);
     }
 
     function addCourse(uint256 courseId, string memory name, string memory instructor, string memory description, uint256 courseFee) external onlyRole(ADMIN_ROLE) {
