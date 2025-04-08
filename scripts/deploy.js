@@ -38,9 +38,9 @@ async function loadArtifact(contractName) {
   return JSON.parse(artifact);
 }
 
-// Upload bytecode in chunks
+// Upload bytecode in 20 chunks
 async function uploadBytecodeFile(client, bytecodeBuffer) {
-  const CHUNK_SIZE = 2000;
+  const CHUNK_SIZE = Math.ceil(bytecodeBuffer.length / 20); // Calculate chunk size to split into 20 chunks
   const totalChunks = Math.ceil(bytecodeBuffer.length / CHUNK_SIZE);
 
   console.log(`📤 Uploading bytecode in ${totalChunks} chunks...`);
@@ -72,6 +72,7 @@ async function uploadBytecodeFile(client, bytecodeBuffer) {
   console.log(`✅ Bytecode file uploaded. File ID: ${fileId}`);
   return fileId;
 }
+
 
 // Deploy contract
 async function deployContract(client, fileId, gas, constructorParams = new ContractFunctionParameters()) {
