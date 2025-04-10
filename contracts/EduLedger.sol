@@ -47,7 +47,7 @@ contract EduLedger is AccessControl {
     mapping(uint256 => EnumerableSet.AddressSet) private courseStudents;
     mapping(address => mapping(uint256 => Record)) public studentRecords;
     mapping(uint256 => mapping(address => bool)) public isStudentEnrolled;
-    mapping(uint256 => uint256) public feeAdjustmentRates; // Dynamic fee adjustment
+    mapping(uint256 => uint256) public feeAdjustmentRates;
 
     event CourseCreated(uint256 indexed courseId, string title);
     event CourseUpdated(uint256 indexed courseId, string title, bool active, uint256 feeHBAR, uint256 feeToken);
@@ -69,12 +69,6 @@ contract EduLedger is AccessControl {
     modifier onlyTeacherOf(uint256 courseId) {
         require(courses[courseId].exists, "Course does not exist");
         require(courses[courseId].teacher == msg.sender, "Not authorized");
-        _;
-    }
-
-    modifier onlyCourseManager(uint256 courseId) {
-        require(courses[courseId].exists, "Course does not exist");
-        require(hasRole(COURSE_MANAGER_ROLE, msg.sender), "Not authorized");
         _;
     }
 
@@ -160,7 +154,7 @@ contract EduLedger is AccessControl {
     function setFeeAdjustment(uint256 courseId, uint256 newFeeHBAR, uint256 newFeeToken) external onlyRole(ADMIN_ROLE) {
         courses[courseId].feeHBAR = newFeeHBAR;
         courses[courseId].feeToken = newFeeToken;
-        feeAdjustmentRates[courseId] = block.timestamp; // Store the last adjustment timestamp
+        feeAdjustmentRates[courseId] = block.timestamp;
         emit CourseFeeAdjusted(courseId, newFeeHBAR, newFeeToken);
     }
 
