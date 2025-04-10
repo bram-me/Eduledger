@@ -18,17 +18,17 @@ contract EduCertificateNFT is ERC721URIStorage, AccessControl {
         string studentName;
         string grade;
         string issuedDate;
-        string templateURI;  // Custom template URI
-        uint256 expirationDate;  // Expiration date
-        string institution; // Store the institution
+        string templateURI;
+        uint256 expirationDate;
+        string institution;
     }
 
     mapping(uint256 => CertificateData) public certificateDetails;
-    mapping(address => bool) public eligibleForDiscount;  // Tracking eligibility for discount
-    mapping(uint256 => bool) public certificateUsed;  // Tracking if the certificate is used
-    mapping(uint256 => Course) public courseCatalog;  // Catalog of courses
-    mapping(address => address) public referrals;  // Referral mapping
-    mapping(address => uint256[]) public studentCourses;  // Student courses mapping
+    mapping(address => bool) public eligibleForDiscount;
+    mapping(uint256 => bool) public certificateUsed;
+    mapping(uint256 => Course) public courseCatalog;
+    mapping(address => address) public referrals;
+    mapping(address => uint256[]) public studentCourses;
 
     event CertificateMinted(address indexed student, uint256 indexed tokenId, string uri);
     event CertificateBurned(uint256 indexed tokenId);
@@ -51,7 +51,6 @@ contract EduCertificateNFT is ERC721URIStorage, AccessControl {
         _grantRole(ADMIN_ROLE, msg.sender);
     }
 
-    // Define mintCertificate as internal
     function mintCertificate(
         address student,
         string memory tokenURI,
@@ -61,7 +60,7 @@ contract EduCertificateNFT is ERC721URIStorage, AccessControl {
         string memory issuedDate,
         uint256 expirationDate,
         string memory templateURI,
-        string memory institution // Add institution here
+        string memory institution
     ) internal returns (uint256) {
         _tokenIds.increment();
         uint256 tokenId = _tokenIds.current();
@@ -76,14 +75,13 @@ contract EduCertificateNFT is ERC721URIStorage, AccessControl {
             issuedDate: issuedDate,
             expirationDate: expirationDate,
             templateURI: templateURI,
-            institution: institution // Store institution here
+            institution: institution
         });
 
         emit CertificateMinted(student, tokenId, tokenURI);
         return tokenId;
     }
 
-    // Define mintCertificateWithDiscount (without discountPercentage)
     function mintCertificateWithDiscount(
         address student,
         string memory tokenURI,
@@ -93,10 +91,9 @@ contract EduCertificateNFT is ERC721URIStorage, AccessControl {
         string memory issuedDate,
         uint256 expirationDate,
         string memory templateURI,
-        string memory institution // Add institution here
+        string memory institution
     ) external onlyRole(MINTER_ROLE) returns (uint256) {
         require(eligibleForDiscount[student], "Student is not eligible for discount");
-        // Apply discount logic here (if any)
         return mintCertificate(student, tokenURI, courseName, studentName, grade, issuedDate, expirationDate, templateURI, institution);
     }
 
@@ -148,11 +145,10 @@ contract EduCertificateNFT is ERC721URIStorage, AccessControl {
         emit CertificateTransferRequested(tokenId, msg.sender, to);
     }
 
-    // Set custom metadata for a certificate, including institution
     function setCustomMetadata(uint256 tokenId, string memory institution, string memory templateURI) external onlyRole(ADMIN_ROLE) {
         require(_exists(tokenId), "Certificate does not exist");
         certificateDetails[tokenId].templateURI = templateURI;
-        certificateDetails[tokenId].institution = institution; // Store institution here
+        certificateDetails[tokenId].institution = institution;
     }
 
     function setDiscountEligibility(address student, bool eligible) external onlyRole(ADMIN_ROLE) {
@@ -170,7 +166,6 @@ contract EduCertificateNFT is ERC721URIStorage, AccessControl {
     function setReferral(address referee, address referrer) external {
         require(referrals[referee] == address(0), "Referee already has a referrer");
         referrals[referee] = referrer;
-        // Apply referral rewards or discounts here
     }
 
     function completeCourse(address student, uint256 courseId) external onlyRole(ASSISTANT_TEACHER_ROLE) {
@@ -181,16 +176,14 @@ contract EduCertificateNFT is ERC721URIStorage, AccessControl {
     }
 
     function allCoursesCompleted(address student) private view returns (bool) {
-        // Assume there are 5 required courses for the program
         return studentCourses[student].length == 5;
     }
 
     function mintProgramCompletionCertificate(address student) private {
-        // Mint a program completion certificate for the student
-        // This could mint a specific certificate for completing all courses
+        // Implementation depends on how you wish to distinguish this certificate
     }
 
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721URIStorage, AccessControl) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721URIStorage, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }
